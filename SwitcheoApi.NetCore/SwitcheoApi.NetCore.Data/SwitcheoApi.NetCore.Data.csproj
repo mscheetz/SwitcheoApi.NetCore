@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SwitcheoApi.NetCore.Core.Interface\SwitcheoApi.NetCore.Core.Interface.csproj" />
     <ProjectReference Include="..\SwitcheoApi.NetCore.Data.Interface\SwitcheoApi.NetCore.Data.Interface.csproj" />
     <ProjectReference Include="..\SwitcheoApi.NetCore.Entities\SwitcheoApi.NetCore.Entities.csproj" />
