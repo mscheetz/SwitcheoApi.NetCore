@@ -4,6 +4,7 @@ using SwitcheoApi.NetCore.Data.Interface;
 using SwitcheoApi.NetCore.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SwitcheoApi.NetCore.Data
@@ -16,6 +17,13 @@ namespace SwitcheoApi.NetCore.Data
 
         public SwitcheoRepository()
         {
+            _restRepo = new RestRepository();
+            _helper = new Helper();
+        }
+
+        public SwitcheoRepository(bool testRegion = false)
+        {
+            _baseUrl = "https://test-api.switcheo.network";
             _restRepo = new RestRepository();
             _helper = new Helper();
         }
@@ -58,8 +66,8 @@ namespace SwitcheoApi.NetCore.Data
         /// <summary>
         /// Get hashes of contracts deployed by Switcheo
         /// </summary>
-        /// <returns>Array of Contracts</returns>
-        public async Task<Contract[]> GetContracts()
+        /// <returns>Contracts dictionary</returns>
+        public async Task<Dictionary<string, Dictionary<string, string>>> GetContracts()
         {
             var endpoint = "/v2/contracts";
 
@@ -67,7 +75,7 @@ namespace SwitcheoApi.NetCore.Data
 
             try
             {
-                var response = await _restRepo.GetApiStream<Contract[]>(url);
+                var response = await _restRepo.GetApiStream<Dictionary<string, Dictionary<string, string>>>(url);
 
                 return response;
             }
@@ -87,21 +95,43 @@ namespace SwitcheoApi.NetCore.Data
         /// <returns>Array of Candlesticks</returns>
         public async Task<Candlstick[]> GetCandlesticks(string pair, Interval interval, long endTime = 0, int stickCount = 10)
         {
-            var endpoint = "/v2/tickers/candlesticks";
             if(endTime == 0)
             {
                 endTime = _helper.UTCtoUnixTime();
             }
-            var startTime = _helper.GetFromUnixTime(endTime, interval, stickCount);
+            var sticks = stickCount < 10 ? 10 : stickCount;
+            var startTime = _helper.GetFromUnixTime(endTime, interval, sticks);
+
+            var candlesticks = await GetCandleSticks(pair, interval, endTime, startTime);
+
+            if (candlesticks.Length > stickCount)
+            {
+                candlesticks = candlesticks.Take(stickCount).ToArray();
+            }
+
+            return candlesticks;
+        }
+
+        /// <summary>
+        /// Get candlestick chart data
+        /// </summary>
+        /// <param name="pair">Pair to filter</param>
+        /// <param name="interval">Time interval of candlestick</param>
+        /// <param name="endTime">Unix time of last candlestick</param>
+        /// <param name="startTime">Unix time of 1st candlestick</param>
+        /// <returns>Array of Candlesticks</returns>
+        public async Task<Candlstick[]> GetCandleSticks(string pair, Interval interval, long endTime, long startTime)
+        {
+            var endpoint = "/v2/tickers/candlesticks";
             var queryString = new List<string>
             {
+                $"end_time={endTime}",
+                $"interval={(int)interval}",
                 $"pair={pair}",
-                $"interval={interval}",
-                $"startTime={startTime}",
-                $"endTime={endTime}",
+                $"start_time={startTime}"
             };
 
-            var url = _baseUrl + endpoint + _helper.ListToString(queryString);
+            var url = _baseUrl + endpoint + "?" + _helper.ListToQueryString(queryString);
 
             try
             {
@@ -141,8 +171,8 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="symbols">String array of currency symbols (default null)</param>
         /// <param name="bases">String array of base pairs (default null)</param>
-        /// <returns>Array LastPrices</returns>
-        public async Task<LastPrices[]> GetLastPrice(string[] symbols = null, string[] bases = null)
+        /// <returns>LastPrices dictionary</returns>
+        public async Task<Dictionary<string, Dictionary<string, decimal>>> GetLastPrice(string[] symbols = null, string[] bases = null)
         {
             var endpoint = "/v2/tickers/last_price";
             var querystring = string.Empty;
@@ -173,7 +203,7 @@ namespace SwitcheoApi.NetCore.Data
 
             try
             {
-                var response = await _restRepo.GetApiStream<LastPrices[]>(url);
+                var response = await _restRepo.GetApiStream<Dictionary<string, Dictionary<string, decimal>>>(url);
 
                 return response;
             }
