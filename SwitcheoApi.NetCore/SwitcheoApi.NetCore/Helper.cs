@@ -21,6 +21,16 @@ namespace SwitcheoApi.NetCore.Core
         }
 
         /// <summary>
+        /// Convert a list of strings to a query string
+        /// </summary>
+        /// <param name="list">List of strings to convert</param>
+        /// <returns>Query string from list</returns>
+        public string ListToQueryString(List<string> list)
+        {
+            return string.Join("&", list.ToArray());
+        }
+
+        /// <summary>
         /// Convert end of current minute to unix timestamp
         /// </summary>
         /// <returns>unix timestamp</returns>
