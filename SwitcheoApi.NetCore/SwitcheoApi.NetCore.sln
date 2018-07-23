@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitcheoApi.NetCore.Data", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitcheoApi.NetCore.Data.Interface", "SwitcheoApi.NetCore.Data.Interface\SwitcheoApi.NetCore.Data.Interface.csproj", "{D17FF95B-B627-4032-AC66-9337FC466E13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitcheoApi.NetCore.Core.Interface", "SwitcheoApi.NetCore.Core.Interface\SwitcheoApi.NetCore.Core.Interface.csproj", "{7CBE43A6-1273-45D7-9D57-670F18834BA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitcheoApi.NetCore.Core.Interface", "SwitcheoApi.NetCore.Core.Interface\SwitcheoApi.NetCore.Core.Interface.csproj", "{7CBE43A6-1273-45D7-9D57-670F18834BA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitcheoApi.NetCore.Entities", "SwitcheoApi.NetCore.Entities\SwitcheoApi.NetCore.Entities.csproj", "{FD2FC5E4-21F4-4B5A-9E29-85CED6FCBE2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitcheoApi.NetCore.Entities", "SwitcheoApi.NetCore.Entities\SwitcheoApi.NetCore.Entities.csproj", "{FD2FC5E4-21F4-4B5A-9E29-85CED6FCBE2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitcheoApi.NetCore.Data.Tests", "SwitcheoApi.NetCore.Data.Tests\SwitcheoApi.NetCore.Data.Tests.csproj", "{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{FD2FC5E4-21F4-4B5A-9E29-85CED6FCBE2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD2FC5E4-21F4-4B5A-9E29-85CED6FCBE2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD2FC5E4-21F4-4B5A-9E29-85CED6FCBE2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
