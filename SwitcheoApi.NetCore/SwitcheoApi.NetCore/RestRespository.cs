@@ -49,7 +49,7 @@ namespace SwitcheoApi.NetCore.Core
                     {
                         return JsonConvert.DeserializeObject<T>(responseMessage);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         return default(T);
                     }
@@ -106,7 +106,7 @@ namespace SwitcheoApi.NetCore.Core
                     {
                         return JsonConvert.DeserializeObject<T>(responseMessage);
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         return default(T);
                     }
@@ -155,7 +155,7 @@ namespace SwitcheoApi.NetCore.Core
                     {
                         return JsonConvert.DeserializeObject<T>(responseMessage);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         return default(T);
                     }
@@ -200,7 +200,7 @@ namespace SwitcheoApi.NetCore.Core
                     {
                         return JsonConvert.DeserializeObject<T>(responseMessage);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         return default(T);
                     }
@@ -245,7 +245,7 @@ namespace SwitcheoApi.NetCore.Core
                     {
                         return JsonConvert.DeserializeObject<T>(responseMessage);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         return default(T);
                     }
