@@ -72,6 +72,16 @@ namespace SwitcheoApi.NetCore.Core
         }
 
         /// <summary>
+        /// Convert UTC DateTime to unix timestamp
+        /// </summary>
+        /// <param name="localTime">UTC DateTime object</param>
+        /// <returns>unix timestamp</returns>
+        public long UTCtoUnixTime(DateTimeOffset utcTimestamp)
+        {
+            return ((utcTimestamp.Ticks - epochTicks) / TimeSpan.TicksPerSecond);
+        }
+
+        /// <summary>
         /// Get unix time off-set from current unix time
         /// </summary>
         /// <param name="ending">Ending time</param>
