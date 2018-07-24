@@ -111,5 +111,98 @@ namespace SwitcheoApi.NetCore.Data.Tests
 
             Assert.True(prices.Count > 0);
         }
+
+        [Fact]
+        public void GetOffers_Test()
+        {
+            var pair = "SWTH_NEO";
+            var offers = _repo.GetOffers(pair).Result;
+
+            Assert.NotNull(offers);
+        }
+
+        [Fact]
+        public void GetTradesDefaults_Test()
+        {
+            var pair = "SWTH_NEO";
+            var trades = _repo.GetTrades(pair).Result;
+
+            Assert.NotNull(trades);
+        }
+
+        [Fact]
+        public void GetTradesBetweenDates_Test()
+        {
+            var pair = "SWTH_NEO";
+            var from = new DateTimeOffset(2018, 7, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
+            var to = new DateTimeOffset(2018, 7, 17, 2, 22, 00, TimeSpan.FromSeconds(0));
+            var trades = _repo.GetTrades(pair, from, to).Result;
+
+            Assert.NotNull(trades);
+        }
+
+        [Fact]
+        public void GetTradesBadDateRange_Test()
+        {
+            var pair = "SWTH_NEO";
+            var from = new DateTimeOffset(2018, 7, 17, 2, 22, 00, TimeSpan.FromSeconds(0));
+            var to = new DateTimeOffset(2018, 7, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
+            Action act = () => _repo.GetTrades(pair, from, to);
+
+            Assert.Throws<Exception>(act);
+        }
+
+        [Fact]
+        public void GetTradesFromDateOnly_Test()
+        {
+            var pair = "SWTH_NEO";
+            var from = new DateTimeOffset(2018, 7, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
+            var trades = _repo.GetTrades(pair, from, null).Result;
+
+            Assert.True(trades.Length > 0);
+        }
+
+        [Fact]
+        public void GetTradesToDateOnly_Test()
+        {
+            var pair = "SWTH_NEO";
+            var to = new DateTimeOffset(2018, 7, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
+            var trades = _repo.GetTrades(pair, null, to).Result;
+
+            Assert.True(trades.Length > 0);
+        }
+
+        [Fact]
+        public void GetTradesSameDates_Test()
+        {
+            var pair = "SWTH_NEO";
+            var from = new DateTimeOffset(2018, 7, 17, 2, 18, 54, TimeSpan.FromSeconds(0));
+            var to = from;
+            var trades = _repo.GetTrades(pair, from, to).Result;
+
+            Assert.True(trades.Length == 0);
+        }
+
+        [Fact]
+        public void GetTradesLimitOnly_Test()
+        {
+            var pair = "SWTH_NEO";
+            var limit = 100;
+            var trades = _repo.GetTrades(pair, limit).Result;
+
+            Assert.True(trades.Length == limit);
+        }
+
+        [Fact]
+        public void GetBalances_Test()
+        {
+            var address = "87cf67daa0c1e9b6caa1443cf5555b09cb3f8e5f";
+            var balances = _repo.GetBalances(address).Result;
+
+            Assert.NotNull(balances);
+            Assert.True(balances.confirmed.Count > 0);
+            Assert.True(balances.confirming.Count > 0);
+            Assert.True(balances.locked.Count > 0);
+        }
     }
 }

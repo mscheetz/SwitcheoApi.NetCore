@@ -14,18 +14,25 @@ namespace SwitcheoApi.NetCore.Data
         private string _baseUrl = "https://api.switcheo.network";
         private IRestRepository _restRepo;
         private Helper _helper;
+        private string _contract_version;
+        private string _contract_hash;
+        private string[] _contract_hashes;
 
-        public SwitcheoRepository()
+        public SwitcheoRepository(string version = "")
         {
             _restRepo = new RestRepository();
             _helper = new Helper();
+            _contract_version = version;
+            _contract_hash = GetContractHash();
         }
 
-        public SwitcheoRepository(bool testRegion = false)
+        public SwitcheoRepository(bool testRegion = false, string version = "")
         {
             _baseUrl = "https://test-api.switcheo.network";
             _restRepo = new RestRepository();
             _helper = new Helper();
+            _contract_version = version;
+            _contract_hash = GetContractHash();
         }
 
         /// <summary>
@@ -211,6 +218,198 @@ namespace SwitcheoApi.NetCore.Data
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Get best 70 offers on the offer book
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>Array of Offers</returns>
+        public async Task<Offer[]> GetOffers(string pair)
+        {
+            var endpoint = "/v2/offers";
+
+            var querystring = new List<string>
+            {
+                $"blockchain=neo",
+                $"contract_hash={_contract_hash}",
+                $"pair={pair}"
+            };
+
+            var url = _baseUrl + endpoint + "?" + _helper.ListToQueryString(querystring);
+
+            try
+            {
+                var response = await _restRepo.GetApiStream<Offer[]>(url);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>Array of TradeDetail</returns>
+        public async Task<TradeDetail[]> GetTrades(string pair)
+        {
+            return await OnGetTrades(pair);
+        }
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <param name="tradeCount">Number of trades to return</param>
+        /// <returns>Array of TradeDetail</returns>
+        public async Task<TradeDetail[]> GetTrades(string pair, int tradeCount)
+        {
+            return await OnGetTrades(pair, null, null, tradeCount);
+        }
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <param name="fromDate">Only return trades after this date (default = null)</param>
+        /// <param name="toDate">Only return trades before this date (default = null)</param>
+        /// <returns>Array of TradeDetail</returns>
+        public async Task<TradeDetail[]> GetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null)
+        {
+            return await OnGetTrades(pair, fromDate, toDate);
+        }
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <param name="fromDate">Only return trades after this date (default = null)</param>
+        /// <param name="toDate">Only return trades before this date (default = null)</param>
+        /// <param name="tradeCount">Number of trades to return</param>
+        /// <returns>Array of TradeDetail</returns>
+        public async Task<TradeDetail[]> GetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null, int tradeCount = 5000)
+        {
+            return await OnGetTrades(pair, fromDate, toDate, tradeCount);
+        }
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <param name="fromDate">Only return trades after this date (default = null)</param>
+        /// <param name="toDate">Only return trades before this date (default = null)</param>
+        /// <param name="tradeCount">Number of trades to return (default = 5000)</param>
+        /// <returns>Array of TradeDetail</returns>
+        public async Task<TradeDetail[]> OnGetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null, int tradeCount = 5000)
+        {
+            var endpoint = "/v2/trades";
+            tradeCount = 
+                tradeCount == 0 ? 1 
+                : tradeCount > 10000 ? 10000 
+                : tradeCount;
+
+            var querystring = new List<string>
+            {
+                $"blockchain=neo",
+                $"contract_hash={_contract_hash}",
+                $"pair={pair}"
+            };
+
+            if (tradeCount != 5000)
+            {
+                querystring.Add($"limit={tradeCount}");
+            }
+
+            if (fromDate != null && toDate != null)
+            {
+                if (fromDate > toDate)
+                {
+                    throw new Exception("From date cannot be after to date");
+                }
+            }
+
+            if(fromDate != null)
+            {
+                var from = _helper.UTCtoUnixTime((DateTimeOffset)fromDate);
+                querystring.Add($"from={from}");
+            }
+            if (toDate != null)
+            {
+                var to = _helper.UTCtoUnixTime((DateTimeOffset)toDate);
+                querystring.Add($"to={to}");
+            }
+
+            var url = _baseUrl + endpoint + "?" + _helper.ListToQueryString(querystring);
+
+            try
+            {
+                var response = await _restRepo.GetApiStream<TradeDetail[]>(url);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get contract balance of a given address
+        /// </summary>
+        /// <param name="address">String of addresses</param>
+        /// <returns>Balance response</returns>
+        public async Task<BalanceResponse> GetBalances(string address)
+        {
+            var endpoint = "/v2/balances";
+
+            var hashQueryString = string.Empty;
+            for (int i = 0; i < _contract_hashes.Length; i++)
+            {
+                hashQueryString += $"&contract_hashes[]={_contract_hashes[i]}";
+            }
+
+            var url = _baseUrl + endpoint + $"?addresses[]={address}" + hashQueryString;
+
+            try
+            {
+                var response = await _restRepo.GetApiStream<BalanceResponse>(url);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets latest or specified contract hash
+        /// </summary>
+        /// <returns>String of hash</returns>
+        private string GetContractHash()
+        {
+            var contracts = GetContracts().Result;
+
+            var versions = contracts["NEO"];
+
+            var hash = string.Empty;
+
+            if(_contract_version == "")
+            {
+                hash = versions.Values.Last();
+            }
+            else
+            {
+                hash = versions[_contract_version];
+            }
+
+            _contract_hashes = versions.Values.ToArray();
+
+            return hash;
         }
     }
 }

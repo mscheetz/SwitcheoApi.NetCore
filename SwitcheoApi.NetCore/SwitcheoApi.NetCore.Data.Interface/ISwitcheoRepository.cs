@@ -53,5 +53,53 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// <param name="bases">String array of base pairs (default null)</param>
         /// <returns>LastPrices dictionary</returns>
         Task<Dictionary<string, Dictionary<string, decimal>>> GetLastPrice(string[] symbols = null, string[] bases = null);
+
+        /// <summary>
+        /// Get best 70 offers on the offer book
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>Array of Offers</returns>
+        Task<Offer[]> GetOffers(string pair);
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>Array of TradeDetail</returns>
+        Task<TradeDetail[]> GetTrades(string pair);
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <param name="tradeCount">Number of trades to return</param>
+        /// <returns>Array of TradeDetail</returns>
+        Task<TradeDetail[]> GetTrades(string pair, int tradeCount);
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <param name="fromDate">Only return trades after this date (default = null)</param>
+        /// <param name="toDate">Only return trades before this date (default = null)</param>
+        /// <returns>Array of TradeDetail</returns>
+        Task<TradeDetail[]> GetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
+
+        /// <summary>
+        /// Get executed trades for a given pair
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <param name="fromDate">Only return trades after this date (default = null)</param>
+        /// <param name="toDate">Only return trades before this date (default = null)</param>
+        /// <param name="tradeCount">Number of trades to return (default = 10)</param>
+        /// <returns>Array of TradeDetail</returns>
+        Task<TradeDetail[]> GetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null, int tradeCount = 5000);
+
+        /// <summary>
+        /// Get contract balance of a given address
+        /// </summary>
+        /// <param name="address">String of addresses</param>
+        /// <returns>Balance response</returns>
+        Task<BalanceResponse> GetBalances(string address);
     }
 }
