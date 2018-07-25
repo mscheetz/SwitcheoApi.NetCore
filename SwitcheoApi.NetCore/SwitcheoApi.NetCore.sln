@@ -13,7 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitcheoApi.NetCore.Core.In
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitcheoApi.NetCore.Entities", "SwitcheoApi.NetCore.Entities\SwitcheoApi.NetCore.Entities.csproj", "{FD2FC5E4-21F4-4B5A-9E29-85CED6FCBE2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitcheoApi.NetCore.Data.Tests", "SwitcheoApi.NetCore.Data.Tests\SwitcheoApi.NetCore.Data.Tests.csproj", "{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwitcheoApi.NetCore.Data.Tests", "SwitcheoApi.NetCore.Data.Tests\SwitcheoApi.NetCore.Data.Tests.csproj", "{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{72FA44C6-FB41-4124-9F58-4DFECDDF80D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{20141F37-E135-4215-87E2-289C3CC68B81}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{CD530A09-9A37-489D-837F-D57EA11861DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitcheoApi.NetCore.Core.Tests", "SwitcheoApi.NetCore.Core.Tests\SwitcheoApi.NetCore.Core.Tests.csproj", "{01B4206F-C73C-42BD-B643-9D27A304EE76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,9 +53,22 @@ Global
 		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01B4206F-C73C-42BD-B643-9D27A304EE76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01B4206F-C73C-42BD-B643-9D27A304EE76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01B4206F-C73C-42BD-B643-9D27A304EE76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01B4206F-C73C-42BD-B643-9D27A304EE76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C165E44A-4E4A-4C1D-BE08-E0FEF658A34D} = {CD530A09-9A37-489D-837F-D57EA11861DE}
+		{A2298CFB-776F-4CBF-8305-83A394E899E2} = {20141F37-E135-4215-87E2-289C3CC68B81}
+		{D17FF95B-B627-4032-AC66-9337FC466E13} = {20141F37-E135-4215-87E2-289C3CC68B81}
+		{7CBE43A6-1273-45D7-9D57-670F18834BA8} = {CD530A09-9A37-489D-837F-D57EA11861DE}
+		{FD2FC5E4-21F4-4B5A-9E29-85CED6FCBE2A} = {CD530A09-9A37-489D-837F-D57EA11861DE}
+		{9C584463-8741-4C9C-8F2C-C6CFA8FB2C02} = {72FA44C6-FB41-4124-9F58-4DFECDDF80D7}
+		{01B4206F-C73C-42BD-B643-9D27A304EE76} = {72FA44C6-FB41-4124-9F58-4DFECDDF80D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F2BD03D0-E261-49EC-8158-EE00205A74C1}
