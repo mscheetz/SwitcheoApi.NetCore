@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SwitcheoApi.NetCore.Entities
 {
-    public class DepositParams
+    public class ScriptParams
     {
         public string scriptHash { get; set; }
         public string operation { get; set; }

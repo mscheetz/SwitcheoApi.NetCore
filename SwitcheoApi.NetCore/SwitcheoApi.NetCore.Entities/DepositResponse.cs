@@ -8,6 +8,6 @@ namespace SwitcheoApi.NetCore.Entities
     {
         public Guid id { get; set; }
         public DepositDetail transaction { get; set; }
-        public DepositParams script_params { get; set; }
+        public ScriptParams script_params { get; set; }
     }
 }
