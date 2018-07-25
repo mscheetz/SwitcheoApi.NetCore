@@ -9,11 +9,15 @@ namespace SwitcheoApi.NetCore.Data.Tests
     public class SwitcheoRepositoryTests
     {
         private ISwitcheoRepository _repo;
+        private ISwitcheoRepository _repoAuth;
         private Helper _helper;
+        private string _address = "AGA7VMVRpRDULskJ7sWsUt9YuhVj6CHz8y";
+        private string _privateKey = "L3SDs1rP2Fs489VGFY4Lt2NAg3Km1PqJsBkQd4QsN8UvotGif1yZ";
 
         public SwitcheoRepositoryTests()
         {
             _repo = new SwitcheoRepository(true);
+            _repoAuth = new SwitcheoRepository(_address, _privateKey, true);
             _helper = new Helper();
         }
 
@@ -203,6 +207,16 @@ namespace SwitcheoApi.NetCore.Data.Tests
             Assert.True(balances.confirmed.Count > 0);
             Assert.True(balances.confirming.Count > 0);
             Assert.True(balances.locked.Count > 0);
+        }
+
+        [Fact]
+        public void PostDeposit_Test()
+        {
+            var asset = "NEO";
+            var amount = 3.5M;
+            var deposit = _repoAuth.CreateDeposit(asset, amount).Result;
+
+            Assert.NotNull(deposit);
         }
     }
 }

@@ -14,26 +14,79 @@ namespace SwitcheoApi.NetCore.Data
         private string _baseUrl = "https://api.switcheo.network";
         private IRestRepository _restRepo;
         private Helper _helper;
+        private Security _security;
         private string _contract_version;
         private string _contract_hash;
         private string[] _contract_hashes;
+        private string _address;
+        private string _key;
 
+        #region Constructor/Destructor
+
+        /// <summary>
+        /// Constructor for non-auth apis
+        /// </summary>
+        /// <param name="version">Contract version (default = "")</param>
         public SwitcheoRepository(string version = "")
         {
             _restRepo = new RestRepository();
             _helper = new Helper();
+            _security = new Security();
             _contract_version = version;
             _contract_hash = GetContractHash();
         }
 
+        /// <summary>
+        /// Constructor for all apis
+        /// </summary>
+        /// <param name="address">Neo wallet address</param>
+        /// <param name="privateKey">Neo wallet primary key</param>
+        /// <param name="version">Contract version (default = "")</param>
+        public SwitcheoRepository(string address, string privateKey, string version = "")
+        {
+            _address = address;
+            _key = privateKey;
+            _restRepo = new RestRepository();
+            _helper = new Helper();
+            _security = new Security();
+            _contract_version = version;
+            _contract_hash = GetContractHash();
+        }
+
+        /// <summary>
+        /// Constructor for test region non-auth apis
+        /// </summary>
+        /// <param name="version">Contract version (default = "")</param>
         public SwitcheoRepository(bool testRegion = false, string version = "")
         {
             _baseUrl = "https://test-api.switcheo.network";
             _restRepo = new RestRepository();
             _helper = new Helper();
+            _security = new Security();
             _contract_version = version;
             _contract_hash = GetContractHash();
         }
+
+        /// <summary>
+        /// Constructor for test region for all apis
+        /// </summary>
+        /// <param name="address">Neo wallet address</param>
+        /// <param name="privateKey">Neo wallet primary key</param>
+        /// <param name="testRegion">Boolean to use test region</param>
+        /// <param name="version">Contract version (default = "")</param>
+        public SwitcheoRepository(string address, string privateKey, bool testRegion = false, string version = "")
+        {
+            _address = address;
+            _key = privateKey;
+            _baseUrl = "https://test-api.switcheo.network";
+            _restRepo = new RestRepository();
+            _helper = new Helper();
+            _security = new Security();
+            _contract_version = version;
+            _contract_hash = GetContractHash();
+        }
+
+        #endregion Constructor/Destructor
 
         /// <summary>
         /// Get available currency pairs on Switcheo Exchange 
@@ -304,7 +357,7 @@ namespace SwitcheoApi.NetCore.Data
         /// <param name="toDate">Only return trades before this date (default = null)</param>
         /// <param name="tradeCount">Number of trades to return (default = 5000)</param>
         /// <returns>Array of TradeDetail</returns>
-        public async Task<TradeDetail[]> OnGetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null, int tradeCount = 5000)
+        private async Task<TradeDetail[]> OnGetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null, int tradeCount = 5000)
         {
             var endpoint = "/v2/trades";
             tradeCount = 
@@ -385,6 +438,187 @@ namespace SwitcheoApi.NetCore.Data
                 return null;
             }
         }
+
+        /// <summary>
+        /// Create a deposit
+        /// </summary>
+        /// <param name="asset">Asset to deposit</param>
+        /// <param name="amount">Amount to deposit</param>
+        /// <returns>Deposit response</returns>
+        public async Task<DepositResponse> CreateDeposit(string asset, decimal amount)
+        {
+            var endpoint = "/v2/deposits";
+
+            var param = new DepositWithdrawalParams
+            {
+                amount = amount,
+                asset_id = asset,
+                blockchain = "neo",
+                contract_hash = _contract_hash,
+                timestamp = _helper.UTCtoUnixTimeMilliseconds()
+            };
+
+            var data = new DepositWithdrawalData(param);
+            data.address = _address;
+            data.signature = _security.CreateSignature(param, _key);
+
+            var url = _baseUrl + endpoint;
+
+            try
+            {
+                var response = await _restRepo.PostApi<DepositResponse, DepositWithdrawalData>(url, data);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Execute a deposit
+        /// </summary>
+        /// <param name="deposit">Deposit detail from creation</param>
+        /// <returns>Deposit response</returns>
+        public async Task<DepositResponse> ExecuteDeposit(DepositResponse deposit)
+        {
+            var sigDic = new Dictionary<string, string>();
+            sigDic.Add("signature", _security.CreateSignature(deposit.transaction, _key));
+            var endpoint = "/v2/deposits";
+            
+            var url = _baseUrl + endpoint + $"/{deposit.id}/broadcast";
+
+            try
+            {
+                var response = await _restRepo.PostApi<DepositResponse, Dictionary<string, string>>(url, sigDic);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Create a withdrawal
+        /// </summary>
+        /// <param name="asset">Asset to withdrawal</param>
+        /// <param name="amount">Amount to withdrawal</param>
+        /// <returns>Dictionary of string keys and values</returns>
+        public async Task<Dictionary<string, string>> CreateWithdrawal(string asset, decimal amount)
+        {
+            var endpoint = "/v2/withdrawals";
+
+            var param = new DepositWithdrawalParams
+            {
+                amount = amount,
+                asset_id = asset,
+                blockchain = "neo",
+                contract_hash = _contract_hash,
+                timestamp = _helper.UTCtoUnixTimeMilliseconds()
+            };
+
+            var data = new DepositWithdrawalData(param);
+            data.address = _address;
+            data.signature = _security.CreateSignature(param, _key);
+
+            var url = _baseUrl + endpoint;
+
+            try
+            {
+                var response = await _restRepo.PostApi<Dictionary<string, string>, DepositWithdrawalData>(url, data);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Execute a withdrawal
+        /// </summary>
+        /// <param name="withdrawalId">Guid of withdrawal request</param>
+        /// <param name="signature">Signature from withdrawal creation</param>
+        /// <returns>Withdrawal response</returns>
+        public async Task<WithdrawalResponse> ExecuteWithdrawal(Guid withdrawalId, string signature)
+        {            
+            var sigDic = new Dictionary<string, string>();
+            sigDic.Add("id", withdrawalId.ToString());
+            sigDic.Add("timestamp", _helper.UTCtoUnixTimeMilliseconds().ToString());
+
+            sigDic.Add("signature", _security.CreateSignature(sigDic, _key));
+
+            var endpoint = "/v2/withdrawals";
+
+            var url = _baseUrl + endpoint + $"/{withdrawalId}/broadcast";
+
+            try
+            {
+                var response = await _restRepo.PostApi<WithdrawalResponse, Dictionary<string, string>>(url, sigDic);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get orders
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <returns>Array of orders</returns>
+        public async Task<Order[]> GetOrders(string address)
+        {
+            return await OnGetOrders(address);
+        }
+
+        /// <summary>
+        /// Get orders
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <param name="pair">String of pair to match</param>
+        /// <returns>Array of orders</returns>
+        public async Task<Order[]> GetOrders(string address, string pair)
+        {
+            return await OnGetOrders(address, pair);
+        }
+
+        /// <summary>
+        /// Get orders
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <param name="pair">String of pair to match</param>
+        /// <returns>Array of orders</returns>
+        private async Task<Order[]> OnGetOrders(string address, string pair = "")
+        {
+            var endpoint = "/v2/orders";
+
+            var queryString = $"?address={address}";
+            if (pair != "")
+            {
+                queryString += $"&pair={pair}";
+            }
+
+            var url = _baseUrl + endpoint + queryString;
+
+            try
+            {
+                var response = await _restRepo.GetApiStream<Order[]>(url);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
 
         /// <summary>
         /// Gets latest or specified contract hash

@@ -101,5 +101,51 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// <param name="address">String of addresses</param>
         /// <returns>Balance response</returns>
         Task<BalanceResponse> GetBalances(string address);
+
+        /// <summary>
+        /// Post a deposit
+        /// </summary>
+        /// <param name="asset">Asset to deposit</param>
+        /// <param name="amount">Amount to deposit</param>
+        /// <returns>Deposit response</returns>
+        Task<DepositResponse> CreateDeposit(string asset, decimal amount);
+
+        /// <summary>
+        /// Execute a deposit
+        /// </summary>
+        /// <param name="deposit">Deposit detail from creation</param>
+        /// <returns>Deposit response</returns>
+        Task<DepositResponse> ExecuteDeposit(DepositResponse deposit);
+
+        /// <summary>
+        /// Create a withdrawal
+        /// </summary>
+        /// <param name="asset">Asset to withdrawal</param>
+        /// <param name="amount">Amount to withdrawal</param>
+        /// <returns>Dictionary of string keys and values</returns>
+        Task<Dictionary<string, string>> CreateWithdrawal(string asset, decimal amount);
+
+        /// <summary>
+        /// Execute a withdrawal
+        /// </summary>
+        /// <param name="withdrawalId">Guid of withdrawal request</param>
+        /// <param name="signature">Signature from withdrawal creation</param>
+        /// <returns>Withdrawal response</returns>
+        Task<WithdrawalResponse> ExecuteWithdrawal(Guid withdrawalId, string signature);
+
+        /// <summary>
+        /// Get orders
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <returns>Array of orders</returns>
+        Task<Order[]> GetOrders(string address);
+
+        /// <summary>
+        /// Get orders
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <param name="pair">String of pair to match</param>
+        /// <returns>Array of orders</returns>
+        Task<Order[]> GetOrders(string address, string pair);
     }
 }
