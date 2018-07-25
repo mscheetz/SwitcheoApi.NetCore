@@ -82,6 +82,15 @@ namespace SwitcheoApi.NetCore.Core
         }
 
         /// <summary>
+        /// Convert current UTC DateTime to unix timestamp milliseconds included
+        /// </summary>
+        /// <returns>unix timestamp</returns>
+        public long UTCtoUnixTimeMilliseconds()
+        {
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        /// <summary>
         /// Get unix time off-set from current unix time
         /// </summary>
         /// <param name="ending">Ending time</param>
