@@ -11,6 +11,8 @@ namespace SwitcheoApi.NetCore.Data.Tests
         private ISwitcheoRepository _repo;
         private ISwitcheoRepository _repoAuth;
         private Helper _helper;
+        private string _documentationAddress = "87cf67daa0c1e9b6caa1443cf5555b09cb3f8e5f";
+        // Empty neo wallet for testing purposes only
         private string _address = "AGA7VMVRpRDULskJ7sWsUt9YuhVj6CHz8y";
         private string _privateKey = "L3SDs1rP2Fs489VGFY4Lt2NAg3Km1PqJsBkQd4QsN8UvotGif1yZ";
 
@@ -200,7 +202,7 @@ namespace SwitcheoApi.NetCore.Data.Tests
         [Fact]
         public void GetBalances_Test()
         {
-            var address = "87cf67daa0c1e9b6caa1443cf5555b09cb3f8e5f";
+            var address = _documentationAddress;
             var balances = _repo.GetBalances(address).Result;
 
             Assert.NotNull(balances);
@@ -217,6 +219,18 @@ namespace SwitcheoApi.NetCore.Data.Tests
             var deposit = _repoAuth.CreateDeposit(asset, amount).Result;
 
             Assert.NotNull(deposit);
+        }
+
+        [Fact]
+        public void CreateOrder_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 1000;
+            var price = .0001M;
+            var side = Side.buy;
+            var order = _repoAuth.CreateOrder(pair, side, price, amount);
+
+            Assert.NotNull(order);
         }
     }
 }
