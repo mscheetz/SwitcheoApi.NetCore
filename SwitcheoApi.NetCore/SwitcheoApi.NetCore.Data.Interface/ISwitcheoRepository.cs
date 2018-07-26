@@ -108,14 +108,14 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// <param name="asset">Asset to deposit</param>
         /// <param name="amount">Amount to deposit</param>
         /// <returns>Deposit response</returns>
-        Task<DepositResponse> CreateDeposit(string asset, decimal amount);
+        Task<TransactionResponse> CreateDeposit(string asset, decimal amount);
 
         /// <summary>
         /// Execute a deposit
         /// </summary>
         /// <param name="deposit">Deposit detail from creation</param>
         /// <returns>Deposit response</returns>
-        Task<DepositResponse> ExecuteDeposit(DepositResponse deposit);
+        Task<TransactionResponse> ExecuteDeposit(TransactionResponse deposit);
 
         /// <summary>
         /// Create a withdrawal
@@ -147,5 +147,43 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// <param name="pair">String of pair to match</param>
         /// <returns>Array of orders</returns>
         Task<Order[]> GetOrders(string address, string pair);
+
+        /// <summary>
+        /// This endpoint creates an order which can be executed through BroadcastOrder.
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="amount">Decimal of order amount</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        Task<Order> CreateOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true);
+
+        /// <summary>
+        /// This is the second endpoint required to execute an order. 
+        /// After using the CreateOrder endpoint, 
+        /// you will receive a response which needs to be signed.
+        /// </summary>
+        /// <param name="order">Order created</param>
+        /// <returns>Boolean when complete</returns>
+        Task<bool?> BroadcastOrder(Order order);
+
+        /// <summary>
+        /// This is the first API call required to cancel an order. 
+        /// Only orders with makes and with 
+        /// an available_amount of more than 0 can be cancelled.
+        /// </summary>
+        /// <param name="order">Order to be cancelled</param>
+        /// <returns>TransactionResponse when complete</returns>
+        Task<TransactionResponse> CreateCancellation(Order order);
+
+        /// <summary>
+        /// This is the second endpoint that must be called to cancel an order. 
+        /// After calling the CreateCancellation endpoint, 
+        /// you will receive a transaction in the response which must be signed.
+        /// </summary>
+        /// <param name="order">Order to be cancelled</param>
+        /// <returns>Boolean when complete</returns>
+        Task<bool?> ExecuteCancellation(TransactionResponse cancellation);
     }
 }

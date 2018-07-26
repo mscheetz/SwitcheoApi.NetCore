@@ -445,7 +445,7 @@ namespace SwitcheoApi.NetCore.Data
         /// <param name="asset">Asset to deposit</param>
         /// <param name="amount">Amount to deposit</param>
         /// <returns>Deposit response</returns>
-        public async Task<DepositResponse> CreateDeposit(string asset, decimal amount)
+        public async Task<TransactionResponse> CreateDeposit(string asset, decimal amount)
         {
             var endpoint = "/v2/deposits";
 
@@ -466,7 +466,7 @@ namespace SwitcheoApi.NetCore.Data
 
             try
             {
-                var response = await _restRepo.PostApi<DepositResponse, DepositWithdrawalData>(url, data);
+                var response = await _restRepo.PostApi<TransactionResponse, DepositWithdrawalData>(url, data);
 
                 return response;
             }
@@ -481,7 +481,7 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="deposit">Deposit detail from creation</param>
         /// <returns>Deposit response</returns>
-        public async Task<DepositResponse> ExecuteDeposit(DepositResponse deposit)
+        public async Task<TransactionResponse> ExecuteDeposit(TransactionResponse deposit)
         {
             var sigDic = new Dictionary<string, string>();
             sigDic.Add("signature", _security.CreateSignature(deposit.transaction, _key));
@@ -491,7 +491,7 @@ namespace SwitcheoApi.NetCore.Data
 
             try
             {
-                var response = await _restRepo.PostApi<DepositResponse, Dictionary<string, string>>(url, sigDic);
+                var response = await _restRepo.PostApi<TransactionResponse, Dictionary<string, string>>(url, sigDic);
 
                 return response;
             }
@@ -545,7 +545,7 @@ namespace SwitcheoApi.NetCore.Data
         /// <param name="signature">Signature from withdrawal creation</param>
         /// <returns>Withdrawal response</returns>
         public async Task<WithdrawalResponse> ExecuteWithdrawal(Guid withdrawalId, string signature)
-        {            
+        {
             var sigDic = new Dictionary<string, string>();
             sigDic.Add("id", withdrawalId.ToString());
             sigDic.Add("timestamp", _helper.UTCtoUnixTimeMilliseconds().ToString());
@@ -619,6 +619,174 @@ namespace SwitcheoApi.NetCore.Data
             }
         }
 
+        /// <summary>
+        /// This endpoint creates an order which can be executed through BroadcastOrder.
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="amount">Decimal of order amount</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> CreateOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true)
+        {
+            var endpoint = "/v2/orders";
+            var url = _baseUrl + endpoint;
+
+            var request = new OrderRequest
+            {
+                blockchain = "neo",
+                contract_hash = _contract_hash,
+                order_type = "limit",
+                pair = pair,
+                price = price,
+                side = side.ToString(),
+                timestamp = _helper.UTCtoUnixTimeMilliseconds(),
+                use_native_tokens = useSWTH,
+                want_amount = amount
+            };
+
+            var signature = _security.CreateSignature(request, _key);
+
+            var signedRequest = new OrderRequestSigned(request)
+            {
+                address = _address,
+                signature = signature
+            };
+            
+            try
+            {
+                var response = await _restRepo.PostApi<Order, OrderRequestSigned>(url, signedRequest);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// This is the second endpoint required to execute an order. 
+        /// After using the CreateOrder endpoint, 
+        /// you will receive a response which needs to be signed.
+        /// </summary>
+        /// <param name="order">Order created</param>
+        /// <returns>Boolean when complete</returns>
+        public async Task<bool?> BroadcastOrder(Order order)
+        {
+            var endpoint = $"/v2/orders/{order.id}/broadcast";
+            var url = _baseUrl + endpoint;
+
+            var signatures = new OrderSignatures
+            {
+                fills = SignFills(order.fills),
+                makes = SignMakes(order.makes)
+            };
+
+            try
+            {
+                var response = await _restRepo.PostApi<bool, OrderSignatures>(url, signatures);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// This is the first API call required to cancel an order. 
+        /// Only orders with makes and with 
+        /// an available_amount of more than 0 can be cancelled.
+        /// </summary>
+        /// <param name="order">Order to be cancelled</param>
+        /// <returns>TransactionResponse when complete</returns>
+        public async Task<TransactionResponse> CreateCancellation(Order order)
+        {
+            var endpoint = $"/v2/cancellations";
+            var url = _baseUrl + endpoint;
+
+            var sigDic = new Dictionary<string, string>();
+            sigDic.Add("order_id", order.id.ToString());
+            sigDic.Add("timestamp", _helper.UTCtoUnixTimeMilliseconds().ToString());
+
+            sigDic.Add("signature", _security.CreateSignature(sigDic, _key));
+            sigDic.Add("address", _address);
+
+            try
+            {
+                var response = await _restRepo.PostApi<TransactionResponse, Dictionary<string, string>>(url, sigDic);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// This is the second endpoint that must be called to cancel an order. 
+        /// After calling the CreateCancellation endpoint, 
+        /// you will receive a transaction in the response which must be signed.
+        /// </summary>
+        /// <param name="order">Order to be cancelled</param>
+        /// <returns>Boolean when complete</returns>
+        public async Task<bool?> ExecuteCancellation(TransactionResponse cancellation)
+        {
+            var endpoint = $"/v2/cancellations/{cancellation.id}/broadcast";
+            var url = _baseUrl + endpoint;
+
+            var sigDic = new Dictionary<string, string>();
+            sigDic.Add("signature", _security.CreateSignature(cancellation.transaction, _key));
+
+            try
+            {
+                var response = await _restRepo.PostApi<bool, Dictionary<string, string>>(url, sigDic);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Sign fills in an order
+        /// </summary>
+        /// <param name="fills">Array of fills to sign</param>
+        /// <returns>String array of signatures</returns>
+        private string[] SignFills(Fill[] fills)
+        {
+            var sigList = new List<string>();
+
+            for (int i = 0; i < fills.Length; i++)
+            {
+                sigList.Add(_security.CreateSignature(fills[i].txn, _key));
+            }
+
+            return sigList.ToArray();
+        }
+
+        /// <summary>
+        /// Sign makes in an order
+        /// </summary>
+        /// <param name="makes">Array of makes to sign</param>
+        /// <returns>String array of signatures</returns>
+        private string[] SignMakes(Make[] makes)
+        {
+            var sigList = new List<string>();
+
+            for (int i = 0; i < makes.Length; i++)
+            {
+                sigList.Add(_security.CreateSignature(makes[i].txn, _key));
+            }
+
+            return sigList.ToArray();
+        }
 
         /// <summary>
         /// Gets latest or specified contract hash
