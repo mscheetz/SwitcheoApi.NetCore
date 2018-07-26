@@ -2,13 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <PackageId>SwitcheoApi.NetCore.Data</PackageId>
+    <Authors></Authors>
+    <Company></Company>
+    <Product></Product>
+    <Description></Description>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageProjectUrl></PackageProjectUrl>
+    <PackageTags></PackageTags>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SwitcheoApi.NetCore.Core.Interface\SwitcheoApi.NetCore.Core.Interface.csproj" />
+    <ProjectReference Include="..\SwitcheoApi.NetCore.Core\SwitcheoApi.NetCore.Core.csproj" />
     <ProjectReference Include="..\SwitcheoApi.NetCore.Data.Interface\SwitcheoApi.NetCore.Data.Interface.csproj" />
     <ProjectReference Include="..\SwitcheoApi.NetCore.Entities\SwitcheoApi.NetCore.Entities.csproj" />
-    <ProjectReference Include="..\SwitcheoApi.NetCore\SwitcheoApi.NetCore.Core.csproj" />
   </ItemGroup>
 
 </Project>

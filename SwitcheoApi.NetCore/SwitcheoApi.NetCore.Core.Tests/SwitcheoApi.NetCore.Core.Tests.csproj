@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SwitcheoApi.NetCore\SwitcheoApi.NetCore.Core.csproj" />
+    <ProjectReference Include="..\SwitcheoApi.NetCore.Core\SwitcheoApi.NetCore.Core.csproj" />
   </ItemGroup>
 
 </Project>

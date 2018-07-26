@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <Authors>Matt Scheetz</Authors>
+    <Description>Switcheo Exchange api access written in .Net Core</Description>
+    <PackageProjectUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</PackageProjectUrl>
+    <PackageTags>switcheo exchange cryptocurrency neo blockchain</PackageTags>
+    <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SwitcheoApi.NetCore.Data.Interface\SwitcheoApi.NetCore.Data.Interface.csproj" />
+    <ProjectReference Include="..\SwitcheoApi.NetCore.Data\SwitcheoApi.NetCore.Data.csproj" />
+    <ProjectReference Include="..\SwitcheoApi.NetCore.Entities\SwitcheoApi.NetCore.Entities.csproj" />
+  </ItemGroup>
+
+</Project>
