@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SwitcheoApi.NetCore.Entities
 {
-    public class Makes
+    public class Make
     {
         public Guid id { get; set; }
         public string offer_hash { get; set; }

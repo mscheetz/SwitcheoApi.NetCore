@@ -23,6 +23,6 @@ namespace SwitcheoApi.NetCore.Entities
         public DateTimeOffset created_at { get; set; }
         public string status { get; set; }
         public Fill[] fills { get; set; }
-        public Makes[] makes { get; set; }
+        public Make[] makes { get; set; }
     }
 }

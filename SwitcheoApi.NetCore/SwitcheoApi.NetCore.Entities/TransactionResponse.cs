@@ -4,10 +4,10 @@ using System.Text;
 
 namespace SwitcheoApi.NetCore.Entities
 {
-    public class DepositResponse
+    public class TransactionResponse
     {
         public Guid id { get; set; }
-        public DepositDetail transaction { get; set; }
+        public TransactionDetail transaction { get; set; }
         public ScriptParams script_params { get; set; }
     }
 }

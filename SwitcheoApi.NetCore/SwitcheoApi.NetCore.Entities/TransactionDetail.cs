@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SwitcheoApi.NetCore.Entities
 {
-    public class DepositDetail
+    public class TransactionDetail
     {
         public string hash { get; set; }
         public string sha256 { get; set; }
