@@ -6,13 +6,14 @@
     <Description>Switcheo Exchange api access written in .Net Core</Description>
     <PackageProjectUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</PackageProjectUrl>
     <PackageTags>switcheo exchange cryptocurrency neo blockchain</PackageTags>
-    <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SwitcheoApi.NetCore.Data.Interface\SwitcheoApi.NetCore.Data.Interface.csproj" />
-    <ProjectReference Include="..\SwitcheoApi.NetCore.Data\SwitcheoApi.NetCore.Data.csproj" />
-    <ProjectReference Include="..\SwitcheoApi.NetCore.Entities\SwitcheoApi.NetCore.Entities.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,5 @@
 ﻿using SwitcheoApi.NetCore.Data;
 using SwitcheoApi.NetCore.Data.Interface;
-using System;
 
 namespace Switcheo.NetCore
 {
