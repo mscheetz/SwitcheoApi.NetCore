@@ -55,3 +55,11 @@ GetOrderes() - get orders for a given address
   
 Secure Endpoints:  
 *<< coming soon >>*  
+
+Donate. 
+NEO. 
+AHtB1D5UtMiTJbDTn5pfJdPit77de19oao. 
+ETH. 
+0x3c8e741c0a2Cb4b8d5cBB1ead482CFDF87FDd66F. 
+BTC. 
+1MGLPvTzxK9argeNRTHJ9EZ3WtGZV6nxit. 
