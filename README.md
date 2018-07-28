@@ -31,14 +31,14 @@ var switcheoRepo = new SwitcheoApiClient(true);
 Secure & non-secure endpoints:  
 ```
 // main-net  
-var switcheoRepo = new SwitcheoApiClient(neoWalletAddress, walletPrivateKey);  
+var switcheo = new SwitcheoApiClient(neoWalletAddress, walletPrivateKey);  
 // test-net  
-var switcheoRepo = new SwitcheoApiClient(neoWalletAddress, walletPrivateKey, true);
+var switcheo = new SwitcheoApiClient(neoWalletAddress, walletPrivateKey, true);
 ```  
   
 Using an endpoint  
 ```
-var pairs = await switcheoRepo.GetPairs();
+var pairs = await switcheo.SwitcheoRepository.GetPairs();
 ```  
 
 Non-secured endpoints:  
