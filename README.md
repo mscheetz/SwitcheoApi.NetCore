@@ -39,6 +39,10 @@ var switcheo = new SwitcheoApiClient(neoWalletAddress, walletPrivateKey, true);
 Using an endpoint  
 ```
 var pairs = await switcheo.SwitcheoRepository.GetPairs();
+```
+or  
+```
+var pairs = switcheo.SwitcheoRepository.GetPairs().Result;
 ```  
 
 Non-secured endpoints:  
