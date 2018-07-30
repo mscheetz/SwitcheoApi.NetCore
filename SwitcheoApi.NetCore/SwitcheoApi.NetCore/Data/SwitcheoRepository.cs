@@ -1,5 +1,6 @@
-﻿using SwitcheoApi.NetCore.Core;
-using SwitcheoApi.NetCore.Core.Interface;
+﻿using RESTApiAccess;
+using RESTApiAccess.Interface;
+using SwitcheoApi.NetCore.Core;
 using SwitcheoApi.NetCore.Data.Interface;
 using SwitcheoApi.NetCore.Entities;
 using System;
@@ -12,7 +13,7 @@ namespace SwitcheoApi.NetCore.Data
     public class SwitcheoRepository : ISwitcheoRepository
     {
         private string _baseUrl = "https://api.switcheo.network";
-        private IRestRepository _restRepo;
+        private IRESTRepository _restRepo;
         private Helper _helper;
         private Security _security;
         private string _contract_version;
@@ -29,7 +30,7 @@ namespace SwitcheoApi.NetCore.Data
         /// <param name="version">Contract version (default = "")</param>
         public SwitcheoRepository(string version = "")
         {
-            _restRepo = new RestRepository();
+            _restRepo = new RESTRepository();
             _helper = new Helper();
             _security = new Security();
             _contract_version = version;
@@ -46,7 +47,7 @@ namespace SwitcheoApi.NetCore.Data
         {
             _address = address;
             _key = privateKey;
-            _restRepo = new RestRepository();
+            _restRepo = new RESTRepository();
             _helper = new Helper();
             _security = new Security();
             _contract_version = version;
@@ -60,7 +61,7 @@ namespace SwitcheoApi.NetCore.Data
         public SwitcheoRepository(bool testRegion = false, string version = "")
         {
             _baseUrl = "https://test-api.switcheo.network";
-            _restRepo = new RestRepository();
+            _restRepo = new RESTRepository();
             _helper = new Helper();
             _security = new Security();
             _contract_version = version;
@@ -79,7 +80,7 @@ namespace SwitcheoApi.NetCore.Data
             _address = address;
             _key = privateKey;
             _baseUrl = "https://test-api.switcheo.network";
-            _restRepo = new RestRepository();
+            _restRepo = new RESTRepository();
             _helper = new Helper();
             _security = new Security();
             _contract_version = version;
