@@ -1,3 +1,4 @@
+using DateTimeHelpers;
 using SwitcheoApi.NetCore.Core;
 using SwitcheoApi.NetCore.Data.Interface;
 using SwitcheoApi.NetCore.Entities;
@@ -11,16 +12,18 @@ namespace SwitcheoApi.NetCore.Data.Tests
         private ISwitcheoRepository _repo;
         private ISwitcheoRepository _repoAuth;
         private Helper _helper;
-        private string _documentationAddress = "87cf67daa0c1e9b6caa1443cf5555b09cb3f8e5f";
+        private DateTimeHelper _dtHelper;
         // Empty neo wallet for testing purposes only
-        private string _address = "AGA7VMVRpRDULskJ7sWsUt9YuhVj6CHz8y";
         private string _privateKey = "L3SDs1rP2Fs489VGFY4Lt2NAg3Km1PqJsBkQd4QsN8UvotGif1yZ";
+        private string _address = "AGA7VMVRpRDULskJ7sWsUt9YuhVj6CHz8y";
+        private string _scriptHash = "0x3161dab9941504e080db38f56ed9c722c7b43404";
 
         public SwitcheoRepositoryTests()
         {
             _repo = new SwitcheoRepository(true);
-            _repoAuth = new SwitcheoRepository(_address, _privateKey, true);
+            _repoAuth = new SwitcheoRepository(_privateKey, true);
             _helper = new Helper();
+            _dtHelper = new DateTimeHelper();
         }
 
         [Fact]
@@ -38,6 +41,22 @@ namespace SwitcheoApi.NetCore.Data.Tests
             var pairs = _repo.GetPairs(bases).Result;
 
             Assert.NotNull(pairs);
+        }
+
+        [Fact]
+        public void GetTokens_Test()
+        {
+            var tokens = _repo.GetTokens().Result;
+
+            Assert.True(tokens.Count > 0);
+        }
+
+        [Fact]
+        public void GetServerTime_Test()
+        {
+            var timestamp = _repo.GetServerTime().Result;
+
+            Assert.True(timestamp > 0);
         }
 
         [Fact]
@@ -63,7 +82,7 @@ namespace SwitcheoApi.NetCore.Data.Tests
         {
             var pair = "SWTH_NEO";
             var interval = Interval.OneD;
-            var endTime = _helper.UTCtoUnixTime();
+            var endTime = _dtHelper.UTCtoUnixTime();
             var sticksToReturn = 2;
             var candlesticks = _repo.GetCandlesticks(pair, interval, endTime, sticksToReturn).Result;
 
@@ -76,9 +95,9 @@ namespace SwitcheoApi.NetCore.Data.Tests
             var pair = "SWTH_NEO";
             var interval = Interval.OneD;
             var now = DateTime.UtcNow;
-            var endTime = _helper.UTCtoUnixTime(now);
+            var endTime = _dtHelper.UTCtoUnixTime(now);
             var tenDays = now.AddDays(-10);
-            var startTime = _helper.UTCtoUnixTime(tenDays);
+            var startTime = _dtHelper.UTCtoUnixTime(tenDays);
             var candlesticks = _repo.GetCandleSticks(pair, interval, endTime, startTime).Result;
 
             Assert.NotNull(candlesticks);
@@ -202,13 +221,17 @@ namespace SwitcheoApi.NetCore.Data.Tests
         [Fact]
         public void GetBalances_Test()
         {
-            var address = _documentationAddress;
-            var balances = _repo.GetBalances(address).Result;
+            var balances = _repo.GetBalances(_address).Result;
 
             Assert.NotNull(balances);
-            Assert.True(balances.confirmed.Count > 0);
-            Assert.True(balances.confirming.Count > 0);
-            Assert.True(balances.locked.Count > 0);
+        }
+
+        [Fact]
+        public void GetBalancesAuth_Test()
+        {
+            var balances = _repoAuth.GetBalances().Result;
+
+            Assert.NotNull(balances);
         }
 
         [Fact]
@@ -222,15 +245,257 @@ namespace SwitcheoApi.NetCore.Data.Tests
         }
 
         [Fact]
-        public void CreateOrder_Test()
+        public void CreateNeoOrderBuy_Test()
         {
             var pair = "SWTH_NEO";
-            var amount = 1000;
-            var price = .0001M;
+            var amount = 3;
+            var price = .004M;
             var side = Side.buy;
-            var order = _repoAuth.CreateOrder(pair, side, price, amount);
+            var order = _repoAuth.CreateNeoOrder(pair, side, price, amount, false).Result;
 
             Assert.NotNull(order);
+        }
+
+        [Fact]
+        public void CreateNeoOrderSell_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 1.2M;
+            var price = .004M;
+            var side = Side.sell;
+            var order = _repoAuth.CreateNeoOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+        }
+
+        [Fact]
+        public void CreateTokenOrderBuy_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 750;
+            var price = .004M;
+            var side = Side.buy;
+            var order = _repoAuth.CreateTokenOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+        }
+
+        [Fact]
+        public void CreateTokenOrderSell_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 100;
+            var price = .004M;
+            var side = Side.sell;
+            var order = _repoAuth.CreateTokenOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+        }
+
+        [Fact]
+        public void CreateAndExecuteNeoOrderBuy_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 3;
+            var price = .0004M;
+            var side = Side.buy;
+            var order = _repoAuth.CreateNeoOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+
+            var broadcast = _repoAuth.BroadcastOrder(order).Result;
+
+            Assert.NotNull(broadcast);
+        }
+
+        [Fact]
+        public void CreateAndExecuteNeoOrderSell_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 1.2M;
+            var price = .004M;
+            var side = Side.sell;
+            var order = _repoAuth.CreateNeoOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+
+            var broadcast = _repoAuth.BroadcastOrder(order).Result;
+
+            Assert.NotNull(broadcast);
+        }
+
+        [Fact]
+        public void CreateAndExecuteTokenOrderBuy_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 750;
+            var price = .0004M;
+            var side = Side.buy;
+            var order = _repoAuth.CreateTokenOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+
+            var broadcast = _repoAuth.BroadcastOrder(order).Result;
+
+            Assert.NotNull(broadcast);
+        }
+
+        [Fact]
+        public void CreateAndExecuteTokenOrderSell_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 100;
+            var price = .004M;
+            var side = Side.sell;
+            var order = _repoAuth.CreateTokenOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+
+            var broadcast = _repoAuth.BroadcastOrder(order).Result;
+
+            Assert.NotNull(broadcast);
+        }
+
+        [Fact]
+        public void CreateAndExecuteNeoOrderSellAndCreateCancelation_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 1.2M;
+            var price = .004M;
+            var side = Side.sell;
+            var order = _repoAuth.CreateNeoOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+
+            var executedOrder = _repoAuth.BroadcastOrder(order).Result;
+
+            Assert.NotNull(executedOrder);
+
+            var cancellation = _repoAuth.CreateCancellation(executedOrder).Result;
+
+            Assert.NotNull(cancellation);
+        }
+
+        [Fact]
+        public void CreateAndExecuteNeoOrderSellAndCreateAndExcecuteCancelation_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 1.2M;
+            var price = .004M;
+            var side = Side.sell;
+            var order = _repoAuth.CreateNeoOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+
+            var executedOrder = _repoAuth.BroadcastOrder(order).Result;
+
+            Assert.NotNull(executedOrder);
+
+            var cancellation = _repoAuth.CreateCancellation(executedOrder).Result;
+
+            Assert.NotNull(cancellation);
+
+            var executedCancellation = _repoAuth.ExecuteCancellation(cancellation).Result;
+
+            Assert.NotNull(executedCancellation);
+        }
+
+        [Fact]
+        public void PlaceNeoOrderSell_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 1.2M;
+            var price = .04M;
+            var side = Side.sell;
+            var order = _repoAuth.PlaceNeoOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+        }
+
+        [Fact]
+        public void PlaceTokenOrderBuy_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 50000;
+            var price = .0001M;
+            var side = Side.buy;
+            var order = _repoAuth.PlaceOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+        }
+
+        [Fact]
+        public void CreateDeposit_Test()
+        {
+            var symbol = "NEO";
+            var amount = 1M;
+
+            var deposit = _repoAuth.CreateDeposit(symbol, amount).Result;
+
+            Assert.NotNull(deposit);
+        }
+
+        [Fact]
+        public void CreateAndExecuteDeposit_Test()
+        {
+            var symbol = "NEO";
+            var amount = 1M;
+
+            var deposit = _repoAuth.CreateDeposit(symbol, amount).Result;
+
+            Assert.NotNull(deposit);
+
+            var executedDeposit = _repoAuth.ExecuteDeposit(deposit).Result;
+
+            Assert.NotNull(executedDeposit);
+        }
+
+        [Fact]
+        public void Deposit_Test()
+        {
+            var symbol = "NEO";
+            var amount = 1M;
+
+            var deposit = _repoAuth.Deposit(symbol, amount).Result;
+
+            Assert.True(deposit);
+        }
+
+        [Fact]
+        public void CreateWithdrawal_Test()
+        {
+            var symbol = "NEO";
+            var amount = 1M;
+
+            var withdrawal = _repoAuth.CreateWithdrawal(symbol, amount).Result;
+
+            Assert.NotNull(withdrawal);
+        }
+
+        [Fact]
+        public void CreateAndExecuteWithdrawal_Test()
+        {
+            var symbol = "NEO";
+            var amount = 1M;
+
+            var withdrawal = _repoAuth.CreateWithdrawal(symbol, amount).Result;
+
+            Assert.NotNull(withdrawal);
+
+            var executedWithdrawal = _repoAuth.ExecuteWithdrawal(withdrawal).Result;
+
+            Assert.NotNull(executedWithdrawal);
+        }
+
+        [Fact]
+        public void Withdrawal_Test()
+        {
+            var symbol = "NEO";
+            var amount = 1M;
+
+            var deposit = _repoAuth.Withdrawal(symbol, amount).Result;
+
+            Assert.True(deposit);
         }
     }
 }

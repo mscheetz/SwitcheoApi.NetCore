@@ -1,22 +1,98 @@
-﻿using SwitcheoApi.NetCore.Entities;
+﻿using DateTimeHelpers;
+using NeoModules.Core;
+using SwitcheoApi.NetCore.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace SwitcheoApi.NetCore.Core
 {
     public class Helper
     {
-        private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        private static readonly long epochTicks = new DateTime(1970, 1, 1, 0, 0, 0).Ticks;
+        private DateTimeHelper _dtHelper = new DateTimeHelper();
 
         /// <summary>
-        /// Convert a list of strings to a single string
+        /// Convert a decimal to a string with fixed number of decimal places
         /// </summary>
-        /// <param name="list">List of strings to convert</param>
-        /// <returns>String from list</returns>
-        public string ListToString(List<string> list)
+        /// <param name="val">Decimal value to convert</param>
+        /// <param name="fixedPlaces">Number of decimal places (default = 8)</param>
+        /// <returns>Converted string</returns>
+        public string DecimalToString(decimal val, int fixedPlaces = 8)
         {
-            return string.Join(",", list.ToArray());
+            fixedPlaces = fixedPlaces < 1 ? 1 : fixedPlaces;
+
+            var zeros = "000000000000000000000000";
+            var format = "0." + zeros.Substring(0, fixedPlaces);
+
+            return val.ToString(format);
+        }
+
+        /// <summary>
+        /// Convert a string to a SecureString
+        /// </summary>
+        /// <param name="stringValue">String value to convert</param>
+        /// <returns>SecureString from string</returns>
+        public SecureString GetSecureString(string stringValue)
+        {
+            var secureString = new SecureString();
+            foreach (char c in stringValue)
+            {
+                secureString.AppendChar(c);
+            }
+
+            return secureString;
+        }
+
+        /// <summary>
+        /// Conver SecureString to string
+        /// </summary>
+        /// <param name="secureString">SecureString value</param>
+        /// <returns>String from SecureString</returns>
+        public string SecureStringToString(SecureString secureString)
+        {
+            IntPtr ipZero = IntPtr.Zero;
+            try
+            {
+                ipZero = Marshal.SecureStringToGlobalAllocUnicode(secureString);
+                return Marshal.PtrToStringUni(ipZero);
+            }
+            finally
+            {
+                Marshal.ZeroFreeGlobalAllocUnicode(ipZero);
+            }
+        }
+
+        /// <summary>
+        /// Convert string to byte array
+        /// from https://github.com/CityOfZion/NeoModules/blob/master/src/NeoModules.Core/UInt160.cs
+        /// </summary>
+        /// <param name="value">String to convert</param>
+        /// <returns>Byte array</returns>
+        public byte[] ValueToByteArray(string value)
+        {
+            if (value == null)
+                throw new ArgumentNullException();
+            if (value.StartsWith("0x"))
+                value = value.Substring(2);
+            if (value.Length != 40)
+                throw new FormatException();
+            return value.HexToBytes().Reverse().ToArray();
+        }
+
+        /// <summary>
+        /// Get off-set timestamp
+        /// </summary>
+        /// <param name="timestamp">Base timestamp</param>
+        /// <param name="interval">Time interval</param>
+        /// <param name="sticks">Number of sticks</param>
+        /// <returns>Calculated timestamp</returns>
+        public long GetFromUnixTime(long timestamp, Interval interval, int sticks)
+        {
+            var seconds = IntervalToSeconds(interval);
+
+            return timestamp - (seconds * sticks);
         }
 
         /// <summary>
@@ -27,81 +103,6 @@ namespace SwitcheoApi.NetCore.Core
         public string ListToQueryString(List<string> list)
         {
             return string.Join("&", list.ToArray());
-        }
-
-        /// <summary>
-        /// Convert end of current minute to unix timestamp
-        /// </summary>
-        /// <returns>unix timestamp</returns>
-        public long UTCEndOfMinuteToUnixTime()
-        {
-            var roundedTime = RoundUp(DateTime.UtcNow, TimeSpan.FromMinutes(1));
-
-            return UTCtoUnixTime(roundedTime);
-        }
-
-        /// <summary>
-        /// Round time up
-        /// </summary>
-        /// <param name="dateTime">Current time</param>
-        /// <param name="timeSpan">Time span to round up to</param>
-        /// <returns>Rouned up time</returns>
-        public DateTime RoundUp(DateTime dateTime, TimeSpan timeSpan)
-        {
-            return new DateTime((dateTime.Ticks + timeSpan.Ticks - 1) / timeSpan.Ticks * timeSpan.Ticks, dateTime.Kind);
-        }
-
-        /// <summary>
-        /// Convert current UTC DateTime to unix timestamp
-        /// </summary>
-        /// <returns>unix timestamp</returns>
-        public long UTCtoUnixTime()
-        {
-            return UTCtoUnixTime(DateTime.UtcNow);
-        }
-
-        /// <summary>
-        /// Convert UTC DateTime to unix timestamp
-        /// </summary>
-        /// <param name="localTime">UTC DateTime object</param>
-        /// <returns>unix timestamp</returns>
-        public long UTCtoUnixTime(DateTime utcTimestamp)
-        {
-            return ((utcTimestamp.Ticks - epochTicks) / TimeSpan.TicksPerSecond);
-        }
-
-        /// <summary>
-        /// Convert UTC DateTime to unix timestamp
-        /// </summary>
-        /// <param name="localTime">UTC DateTime object</param>
-        /// <returns>unix timestamp</returns>
-        public long UTCtoUnixTime(DateTimeOffset utcTimestamp)
-        {
-            return ((utcTimestamp.Ticks - epochTicks) / TimeSpan.TicksPerSecond);
-        }
-
-        /// <summary>
-        /// Convert current UTC DateTime to unix timestamp milliseconds included
-        /// </summary>
-        /// <returns>unix timestamp</returns>
-        public long UTCtoUnixTimeMilliseconds()
-        {
-            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        }
-
-        /// <summary>
-        /// Get unix time off-set from current unix time
-        /// </summary>
-        /// <param name="ending">Ending time</param>
-        /// <param name="interval">Stick interval</param>
-        /// <param name="stickNumber">Number of sticks</param>
-        /// <returns>Long of off-set time</returns>
-        public long GetFromUnixTime(long ending, Interval interval, int stickNumber)
-        {
-            var seconds = IntervalToSeconds(interval);
-            var totalSeconds = seconds * stickNumber;
-
-            return ending - totalSeconds;
         }
 
         /// <summary>
@@ -164,6 +165,28 @@ namespace SwitcheoApi.NetCore.Core
             assets.Add("SWH", "78e6d16b914fe15bc16150aeb11d0c2a8e532bdd");
 
             return assets;
+        }
+
+        /// <summary>
+        /// Calculate transaction amount to post
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <param name="amount">Amount to convert</param>
+        /// <param name="tokens">Tokens and precision</param>
+        /// <returns>String of converted amount</returns>
+        public string CalculateAmount(string pair, decimal amount, Dictionary<string, Token> tokens)
+        {
+            var token = pair.IndexOf("_") >=0 
+                ? pair.Substring(0, pair.IndexOf("_"))
+                : pair;
+            double pow = (double)tokens[token].decimals;
+            var multiplier = (decimal)Math.Pow(10.00, pow);
+
+            var val = amount * multiplier;
+
+            var iVal = (long)val;
+
+            return iVal.ToString();
         }
     }
 }

@@ -8,6 +8,12 @@ namespace SwitcheoApi.NetCore.Data.Interface
     public interface ISwitcheoRepository
     {
         /// <summary>
+        /// Retrieve a list of supported tokens on Switcheo.
+        /// </summary>
+        /// <returns>Tokens dictionary</returns>
+        Task<Dictionary<string, Token>> GetTokens();
+
+        /// <summary>
         /// Get available currency pairs on Switcheo Exchange 
         /// </summary>
         /// <param name="bases">Base pairs to filter on (default all pairs)</param>
@@ -96,11 +102,25 @@ namespace SwitcheoApi.NetCore.Data.Interface
         Task<TradeDetail[]> GetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null, int tradeCount = 5000);
 
         /// <summary>
+        /// Get contract balance for signed in user
+        /// </summary>
+        /// <returns>Balance response</returns>
+        Task<BalanceResponse> GetBalances();
+
+        /// <summary>
         /// Get contract balance of a given address
         /// </summary>
         /// <param name="address">String of addresses</param>
         /// <returns>Balance response</returns>
         Task<BalanceResponse> GetBalances(string address);
+
+        /// <summary>
+        /// Create and execute a deposit to the exchange
+        /// </summary>
+        /// <param name="asset">Asset to deposit</param>
+        /// <param name="amount">Amount to deposit</param>
+        /// <returns>Boolean when complete</returns>
+        Task<bool> Deposit(string asset, decimal amount);
 
         /// <summary>
         /// Post a deposit
@@ -118,20 +138,34 @@ namespace SwitcheoApi.NetCore.Data.Interface
         Task<TransactionResponse> ExecuteDeposit(TransactionResponse deposit);
 
         /// <summary>
+        /// Create and execute a withdrawal from the exchange
+        /// </summary>
+        /// <param name="asset">Asset to withdrawal</param>
+        /// <param name="amount">Amount to withdrawal</param>
+        /// <returns>Boolean when complete</returns>
+        Task<bool> Withdrawal(string asset, decimal amount);
+
+        /// <summary>
         /// Create a withdrawal
         /// </summary>
         /// <param name="asset">Asset to withdrawal</param>
         /// <param name="amount">Amount to withdrawal</param>
-        /// <returns>Dictionary of string keys and values</returns>
-        Task<Dictionary<string, string>> CreateWithdrawal(string asset, decimal amount);
+        /// <returns>Withdrawal id</returns>
+        Task<string> CreateWithdrawal(string asset, decimal amount);
 
         /// <summary>
         /// Execute a withdrawal
         /// </summary>
         /// <param name="withdrawalId">Guid of withdrawal request</param>
-        /// <param name="signature">Signature from withdrawal creation</param>
         /// <returns>Withdrawal response</returns>
-        Task<WithdrawalResponse> ExecuteWithdrawal(Guid withdrawalId, string signature);
+        Task<WithdrawalResponse> ExecuteWithdrawal(string withdrawalId);
+        
+        /// <summary>
+        /// Get orders for current address
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <returns>Array of orders</returns>
+        Task<Order[]> GetOrders();
 
         /// <summary>
         /// Get orders
@@ -154,10 +188,43 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// <param name="pair">String of pair to match</param>
         /// <param name="side">Buy or Sell</param>
         /// <param name="price">Decimal of order price</param>
-        /// <param name="amount">Decimal of order amount</param>
+        /// <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
         /// <param name="useSWTH">Boolean to use SWTH for fees</param>
         /// <returns>Order object</returns>
-        Task<Order> CreateOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true);
+        Task<Order> CreateNeoOrder(string pair, Side side, decimal price, decimal neoAmount, bool useSWTH = true);
+
+        /// <summary>
+        /// This endpoint creates an order which can be executed through BroadcastOrder.
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="tokenAmount">Decimal amount of tokens to buy/sell</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        Task<Order> CreateTokenOrder(string pair, Side side, decimal price, decimal tokenAmount, bool useSWTH = true);
+
+        /// <summary>
+        /// This endpoint places an order using Neo amount
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        Task<Order> PlaceNeoOrder(string pair, Side side, decimal price, decimal neoAmount, bool useSWTH = true);
+
+        /// <summary>
+        /// This endpoint places an order using token amount
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="amount">Decimal amount of tokens to buy/sell</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        Task<Order> PlaceOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true);
 
         /// <summary>
         /// This is the second endpoint required to execute an order. 
@@ -166,7 +233,30 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// </summary>
         /// <param name="order">Order created</param>
         /// <returns>Boolean when complete</returns>
-        Task<bool?> BroadcastOrder(Order order);
+        Task<Order> BroadcastOrder(Order order);
+
+        /// <summary>
+        /// Cancel an order
+        /// </summary>
+        /// <param name="orderId">Id of order to cancel</param>
+        /// <returns>Cancelled Order object</returns>
+        Task<Order> CancelOrder(string orderId);
+
+        /// <summary>
+        /// Cancel an order
+        /// </summary>
+        /// <param name="order">Order to cancel</param>
+        /// <returns>Cancelled Order object</returns>
+        Task<Order> CancelOrder(Order order);
+
+        /// <summary>
+        /// This is the first API call required to cancel an order. 
+        /// Only orders with makes and with 
+        /// an available_amount of more than 0 can be cancelled.
+        /// </summary>
+        /// <param name="orderId">Order Id to be cancelled</param>
+        /// <returns>TransactionResponse when complete</returns>
+        Task<TransactionResponse> CreateCancellation(string orderId);
 
         /// <summary>
         /// This is the first API call required to cancel an order. 
@@ -182,8 +272,14 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// After calling the CreateCancellation endpoint, 
         /// you will receive a transaction in the response which must be signed.
         /// </summary>
-        /// <param name="order">Order to be cancelled</param>
-        /// <returns>Boolean when complete</returns>
-        Task<bool?> ExecuteCancellation(TransactionResponse cancellation);
+        /// <param name="cancellation">Cancellation object</param>
+        /// <returns>Order object</returns>
+        Task<Order> ExecuteCancellation(TransactionResponse cancellation);
+        
+        /// <summary>
+        /// Get server timestamp
+        /// </summary>
+        /// <returns>Long of timestamp</returns>
+        Task<long> GetServerTime();
     }
 }

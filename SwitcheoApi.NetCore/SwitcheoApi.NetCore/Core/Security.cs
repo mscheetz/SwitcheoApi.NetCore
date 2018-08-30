@@ -1,6 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Neo;
+using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Sec;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Math;
+using SwitcheoApi.NetCore.Entities;
 using System;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace SwitcheoApi.NetCore.Core
@@ -8,62 +14,124 @@ namespace SwitcheoApi.NetCore.Core
     public class Security
     {
         /// <summary>
-        /// Create a signature
+        /// Sign a message
         /// </summary>
-        /// <typeparam name="T">Object type of parameters</typeparam>
-        /// <param name="paramList">Parameter object</param>
-        /// <param name="privateKey">Private key</param>
+        /// <param name="message">Message to sign</param>
+        /// <param name="wallet">Wallet for signature</param>
         /// <returns>String of signature</returns>
-        public string CreateSignature<T>(T paramObject, string privateKey)
+        public string SignMessage(string message, NeoWallet wallet)
         {
-            var messageString = CreateMessageString(paramObject);
+            var serializedTransaction = PrepAndSerializeMessage(message);
 
-            var signature = SignMessage(messageString, privateKey);
-
-            return signature;
-        }
-
-        /// <summary>
-        /// Create string for message to sign
-        /// </summary>
-        /// <typeparam name="T">Object type of parameters</typeparam>
-        /// <param name="paramObject">Data object with parameters</param>
-        /// <returns>String to sign</returns>
-        public string CreateMessageString<T>(T paramObject)
-        {
-            var paramStringify = JsonConvert.SerializeObject(paramObject);
-
-            byte[] byteString = Encoding.Default.GetBytes(paramStringify);
-
-            var hex = BitConverter.ToString(byteString);
-
-            hex = hex.Replace("-", "");
-
-            var lenHex = (hex.Length / 2).ToString().PadLeft(2, '0');
-
-            var concatenatedString = lenHex + hex;
-
-            var ledgerCompatibleString = "010001f0" + concatenatedString + "0000";
-
-            return ledgerCompatibleString;
+            return GenerateSignature(serializedTransaction, wallet);
         }
 
         /// <summary>
         /// Sign a message
         /// </summary>
-        /// <param name="message">Message to sign</param>
-        /// <param name="privateKey">Private key to sign with</param>
+        /// <param name="toSign">Message to sign</param>
+        /// <param name="wallet">Wallet for signature</param>
         /// <returns>String of signature</returns>
-        public string SignMessage(string message, string privateKey)
+        public string SignTransaction(byte[] toSign, NeoWallet wallet)
         {
-            ASCIIEncoding encoding = new ASCIIEncoding();
-            byte[] keyBytes = encoding.GetBytes(privateKey);
-            byte[] messageBytes = encoding.GetBytes(message);
-            HMACSHA256 crypotgrapher = new HMACSHA256(keyBytes);
+            return GenerateSignature(toSign, wallet);
+        }
 
-            byte[] bytes = crypotgrapher.ComputeHash(messageBytes);
+        /// <summary>
+        /// Prepare a message to sign
+        /// </summary>
+        /// <param name="message">Message to sign</param>
+        /// <returns>String of prepared message</returns>
+        private string PrepMessage(string message)
+        {
+            var msgBytes = Encoding.UTF8.GetBytes(message);
+            var parameterHexString = msgBytes.ToHexString();
+            var lengthHex = (parameterHexString.Length / 2).ToString("X").PadLeft(2, '0');
+            var concatString = lengthHex + parameterHexString;
+            var serializedTransaction = "010001f0" + concatString + "0000";
 
-            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+            return serializedTransaction;
+        }
+
+        /// <summary>
+        /// Prepare and serialze a message
+        /// </summary>
+        /// <param name="message">Mesage to prep</param>
+        /// <returns>Byte array of message</returns>
+        private byte[] PrepAndSerializeMessage(string message)
+        {
+            var serializedTransaction = PrepMessage(message);
+
+            return serializedTransaction.HexToBytes();
+        }
+
+        /// <summary>
+        /// Generate a signature
+        /// </summary>
+        /// <param name="message">Message to sign</param>
+        /// <param name="wallet">Wallet for signature</param>
+        /// <returns>Message signature</returns>
+        private string GenerateSignature(byte[] message, NeoWallet wallet)
+        {
+            var privateKey = wallet.privateKey;
+
+            var curve = SecNamedCurves.GetByName("secp256r1");
+            var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+
+            var priv = new ECPrivateKeyParameters("ECDSA", (new BigInteger(1, privateKey)), domain);
+            var signer = new ECDsaSigner();
+            var fullsign = new byte[64];
+
+            var hash = new Sha256Digest();
+            hash.BlockUpdate(message, 0, message.Length);
+
+            var result = new byte[32];
+            hash.DoFinal(result, 0);
+
+            message = result;
+
+            signer.Init(true, priv);
+            var signature = signer.GenerateSignature(message);
+
+            var signedResult = ProcessSignature(signature);
+
+            var signedMessage = BitConverter.ToString(signedResult);
+
+            return signedMessage.Replace("-", "").ToLower();
+        }
+
+        /// <summary>
+        /// Process a signature
+        /// </summary>
+        /// <param name="signedMessage">Fully signed message</param>
+        /// <returns>Message signature</returns>
+        private byte[] ProcessSignature(BigInteger[] signedMessage)
+        {
+            var ba64 = new byte[64];
+            var r = signedMessage[0].ToByteArray();
+            var s = signedMessage[1].ToByteArray();
+            var rLen = r.Length;
+            var sLen = s.Length;
+
+            if (rLen < 32)
+            {
+                Array.Copy(r, 0, ba64, 32 - rLen, rLen);
+            }
+            else
+            {
+                Array.Copy(r, rLen - 32, ba64, 0, 32);
+            }
+
+            if (sLen < 32)
+            {
+                Array.Copy(s, 0, ba64, 64 - sLen, sLen);
+            }
+            else
+            {
+                Array.Copy(s, sLen - 32, ba64, 32, 32);
+            }
+
+            return ba64;
         }
     }
 }

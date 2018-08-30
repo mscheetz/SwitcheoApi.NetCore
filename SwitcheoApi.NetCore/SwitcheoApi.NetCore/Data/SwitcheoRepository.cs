@@ -1,5 +1,7 @@
 ﻿using RESTApiAccess;
 using RESTApiAccess.Interface;
+using DateTimeHelpers;
+using Newtonsoft.Json;
 using SwitcheoApi.NetCore.Core;
 using SwitcheoApi.NetCore.Data.Interface;
 using SwitcheoApi.NetCore.Entities;
@@ -15,12 +17,15 @@ namespace SwitcheoApi.NetCore.Data
         private string _baseUrl = "https://api.switcheo.network";
         private IRESTRepository _restRepo;
         private Helper _helper;
+        private DateTimeHelper _dtHelper;
+        private TransactionProcessor _txnProcessor;
         private Security _security;
+        private NeoWallet _neoWallet;
         private string _contract_version;
         private string _contract_hash;
         private string[] _contract_hashes;
-        private string _address;
-        private string _key;
+        private Dictionary<string, Token> _tokens = new Dictionary<string, Token>();
+        private bool _systemTimetamp = false;
 
         #region Constructor/Destructor
 
@@ -30,64 +35,145 @@ namespace SwitcheoApi.NetCore.Data
         /// <param name="version">Contract version (default = "")</param>
         public SwitcheoRepository(string version = "")
         {
-            _restRepo = new RESTRepository();
-            _helper = new Helper();
-            _security = new Security();
-            _contract_version = version;
-            _contract_hash = GetContractHash();
+            LoadRepository("", false, version);
         }
 
         /// <summary>
         /// Constructor for all apis
         /// </summary>
-        /// <param name="address">Neo wallet address</param>
-        /// <param name="privateKey">Neo wallet primary key</param>
+        /// <param name="loginValue">Neo public address or private key</param>
         /// <param name="version">Contract version (default = "")</param>
-        public SwitcheoRepository(string address, string privateKey, string version = "")
+        public SwitcheoRepository(string loginValue, string version = "")
         {
-            _address = address;
-            _key = privateKey;
-            _restRepo = new RESTRepository();
-            _helper = new Helper();
-            _security = new Security();
-            _contract_version = version;
-            _contract_hash = GetContractHash();
+            LoadRepository(loginValue, false, version);
         }
 
         /// <summary>
-        /// Constructor for test region non-auth apis
+        /// Constructor for non-auth apis
         /// </summary>
+        /// <param name="testRegion">Use test region (default = false)</param>
         /// <param name="version">Contract version (default = "")</param>
         public SwitcheoRepository(bool testRegion = false, string version = "")
         {
-            _baseUrl = "https://test-api.switcheo.network";
-            _restRepo = new RESTRepository();
-            _helper = new Helper();
-            _security = new Security();
-            _contract_version = version;
-            _contract_hash = GetContractHash();
+            LoadRepository("", testRegion, version);
         }
 
         /// <summary>
-        /// Constructor for test region for all apis
+        /// Constructor for all apis
         /// </summary>
-        /// <param name="address">Neo wallet address</param>
-        /// <param name="privateKey">Neo wallet primary key</param>
-        /// <param name="testRegion">Boolean to use test region</param>
+        /// <param name="loginValue">Neo public address or private key</param>
+        /// <param name="testRegion">Use test region (default = false)</param>
         /// <param name="version">Contract version (default = "")</param>
-        public SwitcheoRepository(string address, string privateKey, bool testRegion = false, string version = "")
+        public SwitcheoRepository(string loginValue, bool testRegion = false, string version = "")
         {
-            _address = address;
-            _key = privateKey;
-            _baseUrl = "https://test-api.switcheo.network";
-            _restRepo = new RESTRepository();
-            _helper = new Helper();
-            _security = new Security();
-            _contract_version = version;
-            _contract_hash = GetContractHash();
+            LoadRepository(loginValue, testRegion, version);
         }
 
         #endregion Constructor/Destructor
+
+        private void LoadRepository(string addyPk, bool testRegion, string version)
+        {
+            _helper = new Helper();
+            if (string.IsNullOrEmpty(addyPk))
+            {
+                _neoWallet = null;
+            }
+            else if (addyPk.First() == 'A')
+            {
+                _neoWallet = new NeoWallet(addyPk);
+            }
+            else
+            {
+                var pkSecure = _helper.GetSecureString(addyPk);
+                _neoWallet = new NeoWallet(pkSecure);
+            }
+            var testSwitch = testRegion ? "test-" : string.Empty;
+            _baseUrl = $"https://{testSwitch}api.switcheo.network";
+            _restRepo = new RESTRepository();
+            _security = new Security();
+            _txnProcessor = new TransactionProcessor();
+            _tokens = GetTokenList();
+            _contract_version = version;
+            _contract_hash = GetContractHash();
+            _dtHelper = new DateTimeHelper();
+            _systemTimetamp = TimestampCompare();
+        }
+
+        /// <summary>
+        /// Compare exchange and system unix timestamps
+        /// </summary>
+        /// <returns>True if difference less than 1000 MS, otherwise false</returns>
+        private bool TimestampCompare()
+        {
+            var exchangeTS = GetTimestamp();
+            var systemTS = _dtHelper.UTCtoUnixTimeMilliseconds();
+            if(exchangeTS == systemTS || Math.Abs((decimal)exchangeTS - (decimal)systemTS) < 1000)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get server timestamp
+        /// </summary>
+        /// <returns>Long of timestamp</returns>
+        public async Task<long> GetServerTime()
+        {
+            var endpoint = "/v2/exchange/timestamp";
+            var url = _baseUrl + endpoint;
+
+            var response = await _restRepo.GetApi<Dictionary<string, long>>(url);
+
+            return response["timestamp"];
+        }
+
+        /// <summary>
+        /// Get hashes of contracts deployed by Switcheo
+        /// </summary>
+        /// <returns>Contracts dictionary</returns>
+        public async Task<Dictionary<string, Dictionary<string, string>>> GetContracts()
+        {
+            var endpoint = "/v2/exchange/contracts";
+
+            var url = _baseUrl + endpoint;
+
+            try
+            {
+                var response = await _restRepo.GetApiStream<Dictionary<string, Dictionary<string, string>>>(url);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieve a list of supported tokens on Switcheo.
+        /// </summary>
+        /// <returns>Tokens dictionary</returns>
+        public async Task<Dictionary<string, Token>> GetTokens()
+        {
+            var endpoint = "/v2/exchange/tokens";
+
+            var url = _baseUrl + endpoint;
+
+            try
+            {
+                var response = await _restRepo.GetApiStream<Dictionary<string, Token>>(url);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
         /// <summary>
         /// Get available currency pairs on Switcheo Exchange 
@@ -96,7 +182,7 @@ namespace SwitcheoApi.NetCore.Data
         /// <returns>Array of trading pairs</returns>
         public async Task<string[]> GetPairs(string[] bases = null)
         {
-            var endpoint = "/v2/pairs";
+            var endpoint = "/v2/exchange/pairs";
 
             var querystring = string.Empty;
             if (bases != null)
@@ -125,28 +211,6 @@ namespace SwitcheoApi.NetCore.Data
         }
 
         /// <summary>
-        /// Get hashes of contracts deployed by Switcheo
-        /// </summary>
-        /// <returns>Contracts dictionary</returns>
-        public async Task<Dictionary<string, Dictionary<string, string>>> GetContracts()
-        {
-            var endpoint = "/v2/contracts";
-
-            var url = _baseUrl + endpoint;
-
-            try
-            {
-                var response = await _restRepo.GetApiStream<Dictionary<string, Dictionary<string, string>>>(url);
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Get candlestick chart data
         /// </summary>
         /// <param name="pair">Pair to filter</param>
@@ -158,7 +222,7 @@ namespace SwitcheoApi.NetCore.Data
         {
             if(endTime == 0)
             {
-                endTime = _helper.UTCtoUnixTime();
+                endTime = _dtHelper.UTCtoUnixTime();
             }
             var sticks = stickCount < 10 ? 10 : stickCount;
             var startTime = _helper.GetFromUnixTime(endTime, interval, sticks);
@@ -388,12 +452,12 @@ namespace SwitcheoApi.NetCore.Data
 
             if(fromDate != null)
             {
-                var from = _helper.UTCtoUnixTime((DateTimeOffset)fromDate);
+                var from = _dtHelper.UTCtoUnixTime((DateTimeOffset)fromDate);
                 querystring.Add($"from={from}");
             }
             if (toDate != null)
             {
-                var to = _helper.UTCtoUnixTime((DateTimeOffset)toDate);
+                var to = _dtHelper.UTCtoUnixTime((DateTimeOffset)toDate);
                 querystring.Add($"to={to}");
             }
 
@@ -412,11 +476,30 @@ namespace SwitcheoApi.NetCore.Data
         }
 
         /// <summary>
+        /// Get contract balance for signed in user
+        /// </summary>
+        /// <returns>Balance response</returns>
+        public async Task<BalanceResponse> GetBalances()
+        {
+            return await OnGetBalances(_neoWallet.scriptHash.Substring(2));
+        }
+
+        /// <summary>
+        /// Get contract balance of a given address
+        /// </summary>
+        /// <param name="scriptHash">String of script hash (address)</param>
+        /// <returns>Balance response</returns>
+        public async Task<BalanceResponse> GetBalances(string scriptHash)
+        {
+            return await OnGetBalances(scriptHash);
+        }
+
+        /// <summary>
         /// Get contract balance of a given address
         /// </summary>
         /// <param name="address">String of addresses</param>
         /// <returns>Balance response</returns>
-        public async Task<BalanceResponse> GetBalances(string address)
+        private async Task<BalanceResponse> OnGetBalances(string address)
         {
             var endpoint = "/v2/balances";
 
@@ -441,6 +524,21 @@ namespace SwitcheoApi.NetCore.Data
         }
 
         /// <summary>
+        /// Create and execute a deposit to the exchange
+        /// </summary>
+        /// <param name="asset">Asset to deposit</param>
+        /// <param name="amount">Amount to deposit</param>
+        /// <returns>Boolean when complete</returns>
+        public async Task<bool> Deposit(string asset, decimal amount)
+        {
+            var deposit = await CreateDeposit(asset, amount);
+
+            var execution = await ExecuteDeposit(deposit);
+
+            return execution == null ? false : true;
+        }
+
+        /// <summary>
         /// Create a deposit
         /// </summary>
         /// <param name="asset">Asset to deposit</param>
@@ -449,31 +547,32 @@ namespace SwitcheoApi.NetCore.Data
         public async Task<TransactionResponse> CreateDeposit(string asset, decimal amount)
         {
             var endpoint = "/v2/deposits";
+            var timestamp = GetTimestamp();
 
-            var param = new DepositWithdrawalParams
-            {
-                amount = amount,
-                asset_id = asset,
-                blockchain = "neo",
-                contract_hash = _contract_hash,
-                timestamp = _helper.UTCtoUnixTimeMilliseconds()
-            };
+            var param = new Dictionary<string, object>();
 
-            var data = new DepositWithdrawalData(param);
-            data.address = _address;
-            data.signature = _security.CreateSignature(param, _key);
+            param.Add("amount", GetAmount(asset, amount));
+            param.Add("asset_id", asset);
+            param.Add("blockchain", "neo");
+            param.Add("contract_hash", _contract_hash);
+            param.Add("timestamp", timestamp);
 
+            var signature = SignMessage(param);
+
+            param.Add("address", _neoWallet.scriptHash.Substring(2));
+            param.Add("signature", signature);
+            
             var url = _baseUrl + endpoint;
 
             try
             {
-                var response = await _restRepo.PostApi<TransactionResponse, DepositWithdrawalData>(url, data);
+                var response = await _restRepo.PostApi<TransactionResponse, Dictionary<string, object>>(url, param);
 
                 return response;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -484,22 +583,38 @@ namespace SwitcheoApi.NetCore.Data
         /// <returns>Deposit response</returns>
         public async Task<TransactionResponse> ExecuteDeposit(TransactionResponse deposit)
         {
-            var sigDic = new Dictionary<string, string>();
-            sigDic.Add("signature", _security.CreateSignature(deposit.transaction, _key));
+            var sigDic = new Dictionary<string, object>();
+            sigDic.Add("signature", SignTransaction(deposit.transaction));
+
             var endpoint = "/v2/deposits";
             
             var url = _baseUrl + endpoint + $"/{deposit.id}/broadcast";
 
             try
             {
-                var response = await _restRepo.PostApi<TransactionResponse, Dictionary<string, string>>(url, sigDic);
+                var response = await _restRepo.PostApi<TransactionResponse, Dictionary<string, object>>(url, sigDic);
 
                 return response;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Create and execute a withdrawal from the exchange
+        /// </summary>
+        /// <param name="asset">Asset to withdrawal</param>
+        /// <param name="amount">Amount to withdrawal</param>
+        /// <returns>Boolean when complete</returns>
+        public async Task<bool> Withdrawal(string asset, decimal amount)
+        {
+            var withdrawal = await CreateWithdrawal(asset, amount);
+
+            string execution = null;// await ExecuteWithdrawal(withdrawal);
+
+            return execution == null ? false : true;
         }
 
         /// <summary>
@@ -507,35 +622,36 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="asset">Asset to withdrawal</param>
         /// <param name="amount">Amount to withdrawal</param>
-        /// <returns>Dictionary of string keys and values</returns>
-        public async Task<Dictionary<string, string>> CreateWithdrawal(string asset, decimal amount)
+        /// <returns>Withdrawal id</returns>
+        public async Task<string> CreateWithdrawal(string asset, decimal amount)
         {
             var endpoint = "/v2/withdrawals";
+            var timestamp = GetTimestamp();
 
-            var param = new DepositWithdrawalParams
-            {
-                amount = amount,
-                asset_id = asset,
-                blockchain = "neo",
-                contract_hash = _contract_hash,
-                timestamp = _helper.UTCtoUnixTimeMilliseconds()
-            };
+            var param = new Dictionary<string, object>();
 
-            var data = new DepositWithdrawalData(param);
-            data.address = _address;
-            data.signature = _security.CreateSignature(param, _key);
+            param.Add("amount", GetAmount(asset, amount));
+            param.Add("asset_id", asset);
+            param.Add("blockchain", "neo");
+            param.Add("contract_hash", _contract_hash);
+            param.Add("timestamp", timestamp);
+
+            var signature = SignMessage(param);
+
+            param.Add("address", _neoWallet.scriptHash.Substring(2));
+            param.Add("signature", signature);
 
             var url = _baseUrl + endpoint;
 
             try
             {
-                var response = await _restRepo.PostApi<Dictionary<string, string>, DepositWithdrawalData>(url, data);
-
-                return response;
+                var response = await _restRepo.PostApi<WithdrawalId, Dictionary<string, object>>(url, param);
+                
+                return response.id;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -543,15 +659,18 @@ namespace SwitcheoApi.NetCore.Data
         /// Execute a withdrawal
         /// </summary>
         /// <param name="withdrawalId">Guid of withdrawal request</param>
-        /// <param name="signature">Signature from withdrawal creation</param>
         /// <returns>Withdrawal response</returns>
-        public async Task<WithdrawalResponse> ExecuteWithdrawal(Guid withdrawalId, string signature)
+        public async Task<WithdrawalResponse> ExecuteWithdrawal(string withdrawalId)
         {
-            var sigDic = new Dictionary<string, string>();
-            sigDic.Add("id", withdrawalId.ToString());
-            sigDic.Add("timestamp", _helper.UTCtoUnixTimeMilliseconds().ToString());
+            var timestamp = GetTimestamp();
 
-            sigDic.Add("signature", _security.CreateSignature(sigDic, _key));
+            var sigDic = new Dictionary<string, object>();
+            sigDic.Add("id", withdrawalId.ToString());
+            sigDic.Add("timestamp", timestamp);
+
+            var signature = SignMessage(sigDic);
+
+            sigDic.Add("signature", signature);
 
             var endpoint = "/v2/withdrawals";
 
@@ -559,14 +678,26 @@ namespace SwitcheoApi.NetCore.Data
 
             try
             {
-                var response = await _restRepo.PostApi<WithdrawalResponse, Dictionary<string, string>>(url, sigDic);
+                var response = await _restRepo.PostApi<WithdrawalResponse, Dictionary<string, object>>(url, sigDic);
 
                 return response;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Get orders for current address
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <returns>Array of orders</returns>
+        public async Task<Order[]> GetOrders()
+        {
+            var address = _neoWallet.address;
+
+            return await OnGetOrders(address);
         }
 
         /// <summary>
@@ -616,8 +747,86 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// This endpoint creates an order which can be executed through BroadcastOrder.
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> CreateNeoOrder(string pair, Side side, decimal price, decimal neoAmount, bool useSWTH = true)
+        {
+            return await OnCreateOrder(pair, side, price, neoAmount, useSWTH);
+        }
+
+        /// <summary>
+        /// This endpoint creates an order which can be executed through BroadcastOrder.
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="tokenAmount">Decimal amount of tokens to buy/sell</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> CreateTokenOrder(string pair, Side side, decimal price, decimal tokenAmount, bool useSWTH = true)
+        {
+            var wantAmount = price * tokenAmount;
+
+            return await OnCreateOrder(pair, side, price, wantAmount, useSWTH);
+        }
+
+        /// <summary>
+        /// This endpoint places an order using Neo amount
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> PlaceNeoOrder(string pair, Side side, decimal price, decimal neoAmount, bool useSWTH = true)
+        {
+            return await OnCreateAndExecuteOrder(pair, side, price, neoAmount, useSWTH);
+        }
+
+        /// <summary>
+        /// This endpoint places an order using token amount
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="amount">Decimal amount of tokens to buy/sell</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> PlaceOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true)
+        {
+            var wantAmount = price * amount;
+            
+            return await OnCreateAndExecuteOrder(pair, side, price, wantAmount, useSWTH);
+        }
+
+        /// <summary>
+        /// This endpoint creates and broadcasts an order.
+        /// </summary>
+        /// <param name="pair">String of pair to match</param>
+        /// <param name="side">Buy or Sell</param>
+        /// <param name="price">Decimal of order price</param>
+        /// <param name="amount">Decimal of order amount</param>
+        /// <param name="useSWTH">Boolean to use SWTH for fees</param>
+        /// <returns>Order object</returns>
+        private async Task<Order> OnCreateAndExecuteOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true)
+        {
+            var order = await OnCreateOrder(pair, side, price, amount, useSWTH);
+
+            var broadcasted = await BroadcastOrder(order);
+
+            return broadcasted;
         }
 
         /// <summary>
@@ -629,41 +838,38 @@ namespace SwitcheoApi.NetCore.Data
         /// <param name="amount">Decimal of order amount</param>
         /// <param name="useSWTH">Boolean to use SWTH for fees</param>
         /// <returns>Order object</returns>
-        public async Task<Order> CreateOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true)
+        private async Task<Order> OnCreateOrder(string pair, Side side, decimal price, decimal amount, bool useSWTH = true)
         {
             var endpoint = "/v2/orders";
             var url = _baseUrl + endpoint;
 
-            var request = new OrderRequest
-            {
-                blockchain = "neo",
-                contract_hash = _contract_hash,
-                order_type = "limit",
-                pair = pair,
-                price = price,
-                side = side.ToString(),
-                timestamp = _helper.UTCtoUnixTimeMilliseconds(),
-                use_native_tokens = useSWTH,
-                want_amount = amount
-            };
-
-            var signature = _security.CreateSignature(request, _key);
-
-            var signedRequest = new OrderRequestSigned(request)
-            {
-                address = _address,
-                signature = signature
-            };
+            var timestamp = GetTimestamp();
             
+            var request = new Dictionary<string, object>();
+            request.Add("blockchain", "neo");
+            request.Add("contract_hash", _contract_hash.ToLower());
+            request.Add("order_type", "limit");
+            request.Add("pair", pair.ToUpper());
+            request.Add("price", _helper.DecimalToString(price));
+            request.Add("side", side.ToString().ToLower());
+            request.Add("timestamp", timestamp);
+            request.Add("use_native_tokens", useSWTH);
+            request.Add("want_amount", GetAmount(pair, amount));
+
+            var signature = SignMessage(request);
+
+            request.Add("address", _neoWallet.scriptHash.Substring(2));
+            request.Add("signature", signature);
+
             try
             {
-                var response = await _restRepo.PostApi<Order, OrderRequestSigned>(url, signedRequest);
+                var response = await _restRepo.PostApi<Order, Dictionary<string, object>>(url, request);
 
                 return response;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -674,27 +880,73 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="order">Order created</param>
         /// <returns>Boolean when complete</returns>
-        public async Task<bool?> BroadcastOrder(Order order)
+        public async Task<Order> BroadcastOrder(Order order)
         {
             var endpoint = $"/v2/orders/{order.id}/broadcast";
             var url = _baseUrl + endpoint;
 
-            var signatures = new OrderSignatures
-            {
-                fills = SignFills(order.fills),
-                makes = SignMakes(order.makes)
-            };
+            var signatures = new Dictionary<string, object>();
+            signatures.Add("fills", SignFills(order.fills));
+            signatures.Add("makes", SignMakes(order.makes));
+
+            var request = new Dictionary<string, object>();
+            request.Add("signatures", signatures);
 
             try
             {
-                var response = await _restRepo.PostApi<bool, OrderSignatures>(url, signatures);
+                var response = await _restRepo.PostApi<Order, Dictionary<string, object>>(url, request);
 
                 return response;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Cancel an order
+        /// </summary>
+        /// <param name="orderId">Id of order to cancel</param>
+        /// <returns>Cancelled Order object</returns>
+        public async Task<Order> CancelOrder(string orderId)
+        {
+            var cancellationRequest = await CreateCancellation(orderId);
+
+            var cancelledOrder = await ExecuteCancellation(cancellationRequest);
+
+            return cancelledOrder;
+        }
+
+        /// <summary>
+        /// Cancel an order
+        /// </summary>
+        /// <param name="order">Order to cancel</param>
+        /// <returns>Cancelled Order object</returns>
+        public async Task<Order> CancelOrder(Order order)
+        {
+            var cancellationRequest = await CreateCancellation(order);
+
+            var cancelledOrder = await ExecuteCancellation(cancellationRequest);
+
+            return cancelledOrder;
+        }
+
+        /// <summary>
+        /// This is the first API call required to cancel an order. 
+        /// Only orders with makes and with 
+        /// an available_amount of more than 0 can be cancelled.
+        /// </summary>
+        /// <param name="orderId">Order Id to be cancelled</param>
+        /// <returns>TransactionResponse when complete</returns>
+        public async Task<TransactionResponse> CreateCancellation(string orderId)
+        {
+            var order = new Order
+            {
+                id = orderId
+            };
+
+            return await OnCreateCancellation(order);
         }
 
         /// <summary>
@@ -706,25 +958,40 @@ namespace SwitcheoApi.NetCore.Data
         /// <returns>TransactionResponse when complete</returns>
         public async Task<TransactionResponse> CreateCancellation(Order order)
         {
+            return await OnCreateCancellation(order);
+        }
+
+        /// <summary>
+        /// This is the first API call required to cancel an order. 
+        /// Only orders with makes and with 
+        /// an available_amount of more than 0 can be cancelled.
+        /// </summary>
+        /// <param name="order">Order to be cancelled</param>
+        /// <returns>TransactionResponse when complete</returns>
+        public async Task<TransactionResponse> OnCreateCancellation(Order order)
+        {
             var endpoint = $"/v2/cancellations";
             var url = _baseUrl + endpoint;
+            var timestamp = GetTimestamp();
 
-            var sigDic = new Dictionary<string, string>();
+            var sigDic = new Dictionary<string, object>();
             sigDic.Add("order_id", order.id.ToString());
-            sigDic.Add("timestamp", _helper.UTCtoUnixTimeMilliseconds().ToString());
+            sigDic.Add("timestamp", timestamp);
 
-            sigDic.Add("signature", _security.CreateSignature(sigDic, _key));
-            sigDic.Add("address", _address);
+            var signature = SignMessage(sigDic);
+
+            sigDic.Add("signature", signature);
+            sigDic.Add("address", _neoWallet.scriptHash);
 
             try
             {
-                var response = await _restRepo.PostApi<TransactionResponse, Dictionary<string, string>>(url, sigDic);
+                var response = await _restRepo.PostApi<TransactionResponse, Dictionary<string, object>>(url, sigDic);
 
                 return response;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -733,25 +1000,74 @@ namespace SwitcheoApi.NetCore.Data
         /// After calling the CreateCancellation endpoint, 
         /// you will receive a transaction in the response which must be signed.
         /// </summary>
-        /// <param name="order">Order to be cancelled</param>
-        /// <returns>Boolean when complete</returns>
-        public async Task<bool?> ExecuteCancellation(TransactionResponse cancellation)
+        /// <param name="cancellation">Cancellation object</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> ExecuteCancellation(TransactionResponse cancellation)
         {
             var endpoint = $"/v2/cancellations/{cancellation.id}/broadcast";
             var url = _baseUrl + endpoint;
 
-            var sigDic = new Dictionary<string, string>();
-            sigDic.Add("signature", _security.CreateSignature(cancellation.transaction, _key));
+            var sigDic = new Dictionary<string, object>();
+            sigDic.Add("signature", SignTransaction(cancellation.transaction));
 
             try
             {
-                var response = await _restRepo.PostApi<bool, Dictionary<string, string>>(url, sigDic);
+                var response = await _restRepo.PostApi<Order, Dictionary<string, object>>(url, sigDic);
 
                 return response;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Sign a message
+        /// </summary>
+        /// <typeparam name="T">Type of object</typeparam>
+        /// <param name="toSign">Message to sign</param>
+        /// <returns>String of signature</returns>
+        private string SignMessage<T>(T toSign)
+        {
+            var messageString = JsonConvert.SerializeObject(toSign);
+            return SignMessage(messageString);
+        }
+
+        /// <summary>
+        /// Sign a message
+        /// </summary>
+        /// <param name="message">Message to sign</param>
+        /// <returns>String of signature</returns>
+        private string SignMessage(string message)
+        {
+            return _security.SignMessage(message, _neoWallet);
+        }
+
+        /// <summary>
+        /// Get converted exchange amount
+        /// </summary>
+        /// <param name="asset">Asset to calculate</param>
+        /// <param name="amount">Amount of token to convert</param>
+        /// <returns>String of exchange amount</returns>
+        private string GetAmount(string asset, decimal amount)
+        {
+            return _helper.CalculateAmount(asset, amount, _tokens);
+        }
+
+        /// <summary>
+        /// Get unix timestamp
+        /// </summary>
+        /// <returns>Long of timestamp</returns>
+        private long GetTimestamp()
+        {
+            if (_systemTimetamp)
+            {
+                return _dtHelper.UTCtoUnixTimeMilliseconds();
+            }
+            else
+            {
+                return GetServerTime().Result;
             }
         }
 
@@ -760,16 +1076,18 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="fills">Array of fills to sign</param>
         /// <returns>String array of signatures</returns>
-        private string[] SignFills(Fill[] fills)
+        private Dictionary<string, string> SignFills(Fill[] fills)
         {
-            var sigList = new List<string>();
+            var sigList = new Dictionary<string, string>();
 
             for (int i = 0; i < fills.Length; i++)
             {
-                sigList.Add(_security.CreateSignature(fills[i].txn, _key));
+                var signature = SignTransaction(fills[i].txn);
+
+                sigList.Add(fills[i].id, signature);
             }
 
-            return sigList.ToArray();
+            return sigList;
         }
 
         /// <summary>
@@ -777,16 +1095,44 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="makes">Array of makes to sign</param>
         /// <returns>String array of signatures</returns>
-        private string[] SignMakes(Make[] makes)
+        private Dictionary<string, string> SignMakes(Make[] makes)
         {
-            var sigList = new List<string>();
+            var txnProcessor = new TransactionProcessor();
+            var sigList = new Dictionary<string, string>();
 
             for (int i = 0; i < makes.Length; i++)
             {
-                sigList.Add(_security.CreateSignature(makes[i].txn, _key));
+                var signature = SignTransaction(makes[i].txn);
+
+                sigList.Add(makes[i].id, signature);
             }
 
-            return sigList.ToArray();
+            return sigList;
+        }
+
+        /// <summary>
+        /// Sign a Transaction object
+        /// </summary>
+        /// <param name="txn">Transaction to sign</param>
+        /// <returns>String of signature</returns>
+        private string SignTransaction(Transaction txn)
+        {
+            var signedTxn = _txnProcessor.GetSignedTransaction(txn);
+            var serializedTxn = signedTxn.Serialize(false);
+            var signature = _security.SignTransaction(serializedTxn, _neoWallet);
+
+            return signature;
+        }
+
+        /// <summary>
+        /// Get all tokens supported by the exchange
+        /// </summary>
+        /// <returns>Dictionary of tokens</returns>
+        private Dictionary<string, Token> GetTokenList()
+        {
+            var tokens = GetTokens().Result;
+
+            return tokens;
         }
 
         /// <summary>

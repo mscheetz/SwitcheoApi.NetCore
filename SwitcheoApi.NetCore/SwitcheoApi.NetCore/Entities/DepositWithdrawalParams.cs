@@ -2,10 +2,10 @@
 {
     public class DepositWithdrawalParams
     {
-        public decimal amount { get; set; }
+        public string amount { get; set; }
         public string asset_id { get; set; }
         public string blockchain { get; set; }
         public string contract_hash { get; set; }
-        public long timestamp { get; set; }
+        public int timestamp { get; set; }
     }
 }
