@@ -67,6 +67,7 @@ namespace SwitcheoApi.NetCore.Core
 
         /// <summary>
         /// Generate a signature
+        /// Using https://github.com/Zaliro/Switcheo.Net/blob/master/Switcheo.Net/SwitcheoAuthenticationProvider.cs
         /// </summary>
         /// <param name="message">Message to sign</param>
         /// <param name="wallet">Wallet for signature</param>
@@ -102,6 +103,7 @@ namespace SwitcheoApi.NetCore.Core
 
         /// <summary>
         /// Process a signature
+        /// Using https://github.com/Zaliro/Switcheo.Net/blob/master/Switcheo.Net/SwitcheoAuthenticationProvider.cs
         /// </summary>
         /// <param name="signedMessage">Fully signed message</param>
         /// <returns>Message signature</returns>
