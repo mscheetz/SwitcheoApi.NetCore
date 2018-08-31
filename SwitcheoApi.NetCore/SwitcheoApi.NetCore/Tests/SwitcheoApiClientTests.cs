@@ -9,12 +9,16 @@ namespace SwitcheoApi.NetCore.Tests
     public class SwitcheoApiClientTests
     {
         // Empty neo wallet for testing purposes only
-        private string _privateKey = "L3SDs1rP2Fs489VGFY4Lt2NAg3Km1PqJsBkQd4QsN8UvotGif1yZ";
-        private string _address = "AGA7VMVRpRDULskJ7sWsUt9YuhVj6CHz8y";
-        private string _scriptHash = "0x3161dab9941504e080db38f56ed9c722c7b43404";
+        private string _address;
+        private string _privateKey;
+        private string _scriptHash;
 
         public SwitcheoApiClientTests()
         {
+            TestObjects objs = new TestObjects();
+            _address = objs.GetAddress();
+            _privateKey = objs.GetWIF();
+            _scriptHash = objs.GetScriptHash();
         }
 
         [Fact]

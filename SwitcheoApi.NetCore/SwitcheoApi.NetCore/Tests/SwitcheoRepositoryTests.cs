@@ -2,6 +2,7 @@ using DateTimeHelpers;
 using SwitcheoApi.NetCore.Core;
 using SwitcheoApi.NetCore.Data.Interface;
 using SwitcheoApi.NetCore.Entities;
+using SwitcheoApi.NetCore.Tests;
 using System;
 using Xunit;
 
@@ -14,12 +15,16 @@ namespace SwitcheoApi.NetCore.Data.Tests
         private Helper _helper;
         private DateTimeHelper _dtHelper;
         // Empty neo wallet for testing purposes only
-        private string _privateKey = "L3SDs1rP2Fs489VGFY4Lt2NAg3Km1PqJsBkQd4QsN8UvotGif1yZ";
-        private string _address = "AGA7VMVRpRDULskJ7sWsUt9YuhVj6CHz8y";
-        private string _scriptHash = "0x3161dab9941504e080db38f56ed9c722c7b43404";
+        private string _address;
+        private string _privateKey;
+        private string _scriptHash;
 
         public SwitcheoRepositoryTests()
         {
+            TestObjects objs = new TestObjects();
+            _address = objs.GetAddress();
+            _privateKey = objs.GetWIF();
+            _scriptHash = objs.GetScriptHash();
             _repo = new SwitcheoRepository(true);
             _repoAuth = new SwitcheoRepository(_privateKey, true);
             _helper = new Helper();

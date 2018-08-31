@@ -8,6 +8,11 @@
     <PackageTags>switcheo exchange cryptocurrency neo blockchain</PackageTags>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.1.0</Version>
+    <PackageReleaseNotes>Add secure endpoints</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/mscheetz/SwitcheoApi.NetCore/blob/master/LICENSE</PackageLicenseUrl>
+    <Copyright>2018 Matt Scheetz</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
