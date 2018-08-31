@@ -78,7 +78,7 @@ namespace SwitcheoApi.NetCore.Data
             {
                 _neoWallet = null;
             }
-            else if (addyPk.First() == 'A')
+            else if (addyPk.First() == 'A' || addyPk.Substring(0,2) == "0x")
             {
                 _neoWallet = new NeoWallet(addyPk);
             }
@@ -472,6 +472,22 @@ namespace SwitcheoApi.NetCore.Data
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Get loaded wallet
+        /// </summary>
+        /// <returns>NeoWallet if loaded</returns>
+        public NeoWallet GetWallet()
+        {
+            if (_neoWallet != null)
+            {
+                return _neoWallet;
+            }
+            else
+            {
+                throw new Exception("Wallet not loaded! Load project with a public key, address, or private key (WIF).");
             }
         }
 

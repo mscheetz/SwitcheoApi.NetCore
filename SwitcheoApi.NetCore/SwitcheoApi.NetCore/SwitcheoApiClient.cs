@@ -16,6 +16,24 @@ namespace Switcheo.NetCore
         /// <summary>
         /// Constructor, no authorization
         /// </summary>
+        public SwitcheoApiClient()
+        {
+            _switcheoRepository = new SwitcheoRepository(false);
+            _repository = new SwitcheoRepository(false);
+        }
+
+        /// <summary>
+        /// Constructor, with authorization
+        /// </summary>
+        /// <param name="loginValue">Neo public address or private key</param>
+        public SwitcheoApiClient(string loginValue)
+        {
+            _repository = new SwitcheoRepository(loginValue, false);
+        }
+
+        /// <summary>
+        /// Constructor, no authorization
+        /// </summary>
         /// <param name="testRegion">Boolean to use test region (default = false)</param>
         public SwitcheoApiClient(bool testRegion = false)
         {
@@ -30,8 +48,16 @@ namespace Switcheo.NetCore
         /// <param name="testRegion">Boolean to use test region (default = false)</param>
         public SwitcheoApiClient(string loginValue, bool testRegion = false)
         {
-            _switcheoRepository = new SwitcheoRepository(loginValue, testRegion);
             _repository = new SwitcheoRepository(loginValue, testRegion);
+        }
+
+        /// <summary>
+        /// Get a wallet, if loaded
+        /// </summary>
+        /// <returns>NeoWallet object</returns>
+        public NeoWallet GetWallet()
+        {
+            return _repository.GetWallet();
         }
 
         /// <summary>

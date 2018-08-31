@@ -102,6 +102,12 @@ namespace SwitcheoApi.NetCore.Data.Interface
         Task<TradeDetail[]> GetTrades(string pair, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null, int tradeCount = 5000);
 
         /// <summary>
+        /// Get loaded wallet
+        /// </summary>
+        /// <returns>NeoWallet if loaded</returns>
+        NeoWallet GetWallet();
+
+        /// <summary>
         /// Get contract balance for signed in user
         /// </summary>
         /// <returns>Balance response</returns>
