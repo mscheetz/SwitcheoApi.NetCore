@@ -1,5 +1,4 @@
 ﻿using Neo;
-using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Parameters;

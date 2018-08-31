@@ -8,26 +8,21 @@
     <PackageTags>switcheo exchange cryptocurrency neo blockchain</PackageTags>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
-    <PackageReleaseNotes>Add secure endpoints</PackageReleaseNotes>
+    <Version>1.2.0</Version>
+    <PackageReleaseNotes>Cleaned up entities</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/mscheetz/SwitcheoApi.NetCore/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>2018 Matt Scheetz</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CryptoExchange.Net" Version="0.0.36" />
     <PackageReference Include="DateTimeHelpers" Version="1.1.0" />
     <PackageReference Include="Neo" Version="2.8.0" />
     <PackageReference Include="NeoModules.Core" Version="0.0.3" />
     <PackageReference Include="NeoModules.NEP6" Version="0.0.27" />
-    <PackageReference Include="Nethereum.Hex" Version="2.5.1" />
-    <PackageReference Include="Nethereum.Signer" Version="2.5.1" />
-    <PackageReference Include="Nethereum.Util" Version="2.5.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.2" />
     <PackageReference Include="RESTApiAccess" Version="1.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.4" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
