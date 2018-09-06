@@ -49,9 +49,10 @@ GetBalances() | GetBalancesAsync() - get contract balance of an address
 GetCandlesticks() | GetCandlesticksAsync() - get candlestick chart data  
 GetContracts() | GetContractsAsync() - get hashes of contracts deployed by Switcheo  
 GetLast24Hours() | GetLast24HoursAsync() - get last 24-hour data for all pairs  
-GetLastPrice() | GetLastPriceAsync() - get last price of (a) symbol(s)  
+GetLastPrice() | GetLastPriceAsync() - get last price of (a) symbol(s) / or pair  
 GetOffers() | GetOffersAsync() - get best 70 offers on the order book  
-GetOrderes() | GetOrderesAsync() - get orders for a given address  
+GetOrderBook() | GetOrderBookAsync() - get best 70 offers on the order book  
+GetOrders() | GetOrdersAsync() - get orders for a given address  
 GetPairs() | GetPairsAsync() - get all trading pairs  
 GetServerTime() | GetServerTimeAsync() - get Switcheo server time  
 GetTokens() | GetTokensAsync() - get all tokens supported on Switcheo  
