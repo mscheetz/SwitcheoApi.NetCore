@@ -188,5 +188,25 @@ namespace SwitcheoApi.NetCore.Core
 
             return iVal.ToString();
         }
+
+        /// <summary>
+        /// DeCalculate transaction amount to post
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <param name="amount">Amount to convert</param>
+        /// <param name="tokens">Tokens and precision</param>
+        /// <returns>Decimal of converted amount</returns>
+        public decimal DeCalculateAmount(string pair, decimal amount, Dictionary<string, Token> tokens)
+        {
+            var token = pair.IndexOf("_") >= 0
+                ? pair.Substring(0, pair.IndexOf("_"))
+                : pair;
+            double pow = (double)tokens[token].decimals;
+            var multiplier = (decimal)Math.Pow(10.00, pow);
+
+            var val = amount / multiplier;
+            
+            return val;
+        }
     }
 }
