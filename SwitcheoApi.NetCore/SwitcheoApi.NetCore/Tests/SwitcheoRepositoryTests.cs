@@ -4,6 +4,7 @@ using SwitcheoApi.NetCore.Data.Interface;
 using SwitcheoApi.NetCore.Entities;
 using SwitcheoApi.NetCore.Tests;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace SwitcheoApi.NetCore.Data.Tests
@@ -25,7 +26,7 @@ namespace SwitcheoApi.NetCore.Data.Tests
             _address = objs.GetAddress();
             _privateKey = objs.GetWIF();
             _scriptHash = objs.GetScriptHash();
-            _repo = new SwitcheoRepository(true);
+            _repo = new SwitcheoRepository();
             _repoAuth = new SwitcheoRepository(_privateKey, true);
             _helper = new Helper();
             _dtHelper = new DateTimeHelper();
@@ -140,6 +141,24 @@ namespace SwitcheoApi.NetCore.Data.Tests
             var prices = _repo.GetLastPrice(null, bases).Result;
 
             Assert.True(prices.Count > 0);
+        }
+
+        [Fact]
+        public void GetLastPrice_Test()
+        {
+            var pair = "SWTH_NEO";
+            var price = _repo.GetLastPrice(pair).Result;
+
+            Assert.True(price > 0);
+        }
+
+        [Fact]
+        public void GetOrderBook_Test()
+        {
+            var pair = "SWTH_NEO";
+            var offers = _repo.GetOrderBook(pair).Result;
+
+            Assert.NotNull(offers);
         }
 
         [Fact]

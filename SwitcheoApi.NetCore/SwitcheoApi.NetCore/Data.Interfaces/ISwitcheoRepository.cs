@@ -61,6 +61,20 @@ namespace SwitcheoApi.NetCore.Data.Interface
         Task<Dictionary<string, Dictionary<string, decimal>>> GetLastPrice(string[] symbols = null, string[] bases = null);
 
         /// <summary>
+        /// Get last price for a trading pair
+        /// </summary>
+        /// <param name="pair">String of trading pair</param>
+        /// <returns>Decimal of last price</returns>
+        Task<decimal> GetLastPrice(string pair);
+
+        /// <summary>
+        /// Get best 70 offers on the offer book with converted values
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>OrderBook object</returns>
+        Task<OrderBook> GetOrderBook(string pair);
+
+        /// <summary>
         /// Get best 70 offers on the offer book
         /// </summary>
         /// <param name="pair">String of pair</param>

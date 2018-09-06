@@ -32,6 +32,14 @@ namespace SwitcheoApi.NetCore.Data
         /// <summary>
         /// Constructor for non-auth apis
         /// </summary>
+        public SwitcheoRepository()
+        {
+            LoadRepository("", false, "");
+        }
+
+        /// <summary>
+        /// Constructor for non-auth apis
+        /// </summary>
         /// <param name="version">Contract version (default = "")</param>
         public SwitcheoRepository(string version = "")
         {
@@ -336,6 +344,59 @@ namespace SwitcheoApi.NetCore.Data
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Get last price for a trading pair
+        /// </summary>
+        /// <param name="pair">String of trading pair</param>
+        /// <returns>Decimal of last price</returns>
+        public async Task<decimal> GetLastPrice(string pair)
+        {
+            var asset = pair.Substring(0, pair.IndexOf("_"));
+            var baseSymbol = pair.Substring(pair.IndexOf("_") + 1);
+            var prices = await GetLastPrice();
+
+            var assetList = prices[asset];
+
+            return assetList[baseSymbol];
+        }
+
+        /// <summary>
+        /// Get best 70 offers on the offer book with converted values
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>OrderBook object</returns>
+        public async Task<OrderBook> GetOrderBook(string pair)
+        {
+            var offers = await GetOffers(pair);
+
+            var offerList = offers.ToList();
+            var orderBookList = offerList.Select(o => new SwitcheoOrder
+            {
+                available_amount = _helper.DeCalculateAmount(pair, o.available_amount, _tokens),
+                id = o.id,
+                offer_amount = _helper.DeCalculateAmount(pair, o.offer_amount, _tokens),
+                offer_asset = o.offer_asset,
+                want_amount = _helper.DeCalculateAmount(pair, o.want_amount, _tokens),
+                want_asset = o.want_asset
+            }).ToList();
+
+            var orderBook = new OrderBook
+            {
+                asks = orderBookList.ToArray()
+            };
+                //offerList.Cast<OrderBook>().ToList();
+            
+            //for (var i = 0; i < orderBookList.Count; i++)
+            //{
+            //    orderBookList[i].available_amount = _helper.DeCalculateAmount(pair, orderBookList[i].available_amount, _tokens);
+            //    orderBookList[i].offer_amount = _helper.DeCalculateAmount(pair, orderBookList[i].offer_amount, _tokens);
+            //    orderBookList[i].want_amount = _helper.DeCalculateAmount(pair, orderBookList[i].want_amount, _tokens);
+            //    orderBookList[i].price = orderBookList[i].want_amount / orderBookList[i].offer_amount;
+            //}
+
+            return orderBook;
         }
 
         /// <summary>

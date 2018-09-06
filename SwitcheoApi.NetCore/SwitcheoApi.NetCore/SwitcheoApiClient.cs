@@ -135,6 +135,27 @@ namespace Switcheo.NetCore
         }
 
         /// <summary>
+        /// Get last price for a trading pair
+        /// </summary>
+        /// <param name="pair">String of trading pair</param>
+        /// <returns>Decimal of last price</returns>
+        public decimal GetLastPrice(string pair)
+        {
+            return _repository.GetLastPrice(pair).Result;
+        }
+
+        /// <summary>
+        /// Get best 70 offers on the offer book with converted values
+        /// Currently only returning asks
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>OrderBook object</returns>
+        public OrderBook GetOrderBook(string pair)
+        {
+            return _repository.GetOrderBook(pair).Result;
+        }
+
+        /// <summary>
         /// Get best 70 offers on the offer book
         /// </summary>
         /// <param name="pair">String of pair</param>
@@ -518,6 +539,27 @@ namespace Switcheo.NetCore
         public async Task<Dictionary<string, Dictionary<string, decimal>>> GetLastPriceAsync(string[] symbols = null, string[] bases = null)
         {
             return await _repository.GetLastPrice(symbols, bases);
+        }
+
+        /// <summary>
+        /// Get last price for a trading pair
+        /// </summary>
+        /// <param name="pair">String of trading pair</param>
+        /// <returns>Decimal of last price</returns>
+        public async Task<decimal> GetLastPriceAsync(string pair)
+        {
+            return await _repository.GetLastPrice(pair);
+        }
+
+        /// <summary>
+        /// Get best 70 offers on the offer book with converted values
+        /// Currently only returning asks
+        /// </summary>
+        /// <param name="pair">String of pair</param>
+        /// <returns>OrderBook object</returns>
+        public async Task<OrderBook> GetOrderBookAsync(string pair)
+        {
+            return await _repository.GetOrderBook(pair);
         }
 
         /// <summary>
