@@ -8,8 +8,8 @@
     <PackageTags>switcheo exchange cryptocurrency neo blockchain</PackageTags>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.2.3</Version>
-    <PackageReleaseNotes>OrderBook prices rounded to 8 decimal places</PackageReleaseNotes>
+    <Version>1.2.4</Version>
+    <PackageReleaseNotes>Streamlined orderbook endpoint</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/mscheetz/SwitcheoApi.NetCore/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>2018 Matt Scheetz</Copyright>
