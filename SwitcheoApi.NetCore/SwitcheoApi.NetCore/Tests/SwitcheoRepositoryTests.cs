@@ -156,9 +156,9 @@ namespace SwitcheoApi.NetCore.Data.Tests
         public void GetOrderBook_Test()
         {
             var pair = "SWTH_NEO";
-            var offers = _repo.GetOrderBook(pair).Result;
+            var orderBook = _repo.GetOrderBook(pair).Result;
 
-            Assert.NotNull(offers);
+            Assert.NotNull(orderBook);
         }
 
         [Fact]
