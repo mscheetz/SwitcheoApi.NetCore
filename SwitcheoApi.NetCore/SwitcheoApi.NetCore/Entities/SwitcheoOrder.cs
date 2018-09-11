@@ -15,5 +15,15 @@ namespace SwitcheoApi.NetCore.Entities
                     : Math.Round(this.offer_amount / this.want_amount, 8);
             }
         }
+
+        public OrderBookType orderType
+        {
+            get
+            {
+                return this.want_amount < this.offer_amount
+                    ? OrderBookType.ask
+                    : OrderBookType.bid;
+            }
+        }
     }
 }
