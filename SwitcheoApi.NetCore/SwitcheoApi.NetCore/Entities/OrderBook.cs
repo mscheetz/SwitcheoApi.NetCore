@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SwitcheoApi.NetCore.Entities
 {
-    public class OrderBook : Offer
+    public class OrderBook
     {
         public SwitcheoOrder[] bids { get; set; }
         public SwitcheoOrder[] asks { get; set; }

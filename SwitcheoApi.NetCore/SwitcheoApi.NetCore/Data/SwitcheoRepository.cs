@@ -370,6 +370,7 @@ namespace SwitcheoApi.NetCore.Data
         public async Task<OrderBook> GetOrderBook(string pair)
         {
             var offers = await GetOffers(pair);
+            var lastPrice = await GetLastPrice(pair);
 
             var offerList = offers.ToList();
             var orderBookList = offerList.Select(o => new SwitcheoOrder
@@ -384,17 +385,9 @@ namespace SwitcheoApi.NetCore.Data
 
             var orderBook = new OrderBook
             {
-                asks = orderBookList.ToArray()
+                asks = orderBookList.Where(o => o.price > lastPrice).OrderBy(o => o.price).ToArray(),
+                bids = orderBookList.Where(o => o.price < lastPrice).OrderByDescending(o => o.price).ToArray()
             };
-                //offerList.Cast<OrderBook>().ToList();
-            
-            //for (var i = 0; i < orderBookList.Count; i++)
-            //{
-            //    orderBookList[i].available_amount = _helper.DeCalculateAmount(pair, orderBookList[i].available_amount, _tokens);
-            //    orderBookList[i].offer_amount = _helper.DeCalculateAmount(pair, orderBookList[i].offer_amount, _tokens);
-            //    orderBookList[i].want_amount = _helper.DeCalculateAmount(pair, orderBookList[i].want_amount, _tokens);
-            //    orderBookList[i].price = orderBookList[i].want_amount / orderBookList[i].offer_amount;
-            //}
 
             return orderBook;
         }
