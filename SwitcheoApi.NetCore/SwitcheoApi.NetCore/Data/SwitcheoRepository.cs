@@ -758,6 +758,20 @@ namespace SwitcheoApi.NetCore.Data
         }
 
         /// <summary>
+        /// Get an order by order id
+        /// </summary>
+        /// <param name="id">Order id</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> GetOrder(string id)
+        {
+            var address = _neoWallet.address;
+
+            var orders = await OnGetOrders(address);
+
+            return orders.Where(o => o.id.Equals(id)).FirstOrDefault();
+        }
+
+        /// <summary>
         /// Get orders for current address
         /// </summary>
         /// <param name="address">Address with orders</param>
@@ -805,6 +819,8 @@ namespace SwitcheoApi.NetCore.Data
             {
                 queryString += $"&pair={pair}";
             }
+
+            queryString += $"&contract_hash={_contract_hash}";
 
             var url = _baseUrl + endpoint + queryString;
 

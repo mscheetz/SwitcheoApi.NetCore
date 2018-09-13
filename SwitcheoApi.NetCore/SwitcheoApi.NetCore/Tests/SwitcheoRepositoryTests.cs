@@ -269,6 +269,14 @@ namespace SwitcheoApi.NetCore.Data.Tests
         }
 
         [Fact]
+        public void GetOrders_Test()
+        {
+            var orders = _repoAuth.GetOrders().Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
         public void CreateNeoOrderBuy_Test()
         {
             var pair = "SWTH_NEO";
@@ -446,6 +454,22 @@ namespace SwitcheoApi.NetCore.Data.Tests
             var order = _repoAuth.PlaceOrder(pair, side, price, amount, false).Result;
 
             Assert.NotNull(order);
+        }
+
+        [Fact]
+        public void PlaceNeoOrderSellAndQueryOrder_Test()
+        {
+            var pair = "SWTH_NEO";
+            var amount = 1.2M;
+            var price = .04M;
+            var side = Side.sell;
+            var order = _repoAuth.PlaceNeoOrder(pair, side, price, amount, false).Result;
+
+            Assert.NotNull(order);
+
+            var orderStatus = _repoAuth.GetOrder(order.id).Result;
+
+            Assert.NotNull(orderStatus);
         }
 
         [Fact]
