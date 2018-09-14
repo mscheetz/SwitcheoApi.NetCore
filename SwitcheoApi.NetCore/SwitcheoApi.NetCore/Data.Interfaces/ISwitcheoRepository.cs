@@ -11,7 +11,21 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// Retrieve a list of supported tokens on Switcheo.
         /// </summary>
         /// <returns>Tokens dictionary</returns>
-        Task<Dictionary<string, Token>> GetTokens();
+        Dictionary<string, Token> GetTokens();
+
+        /// <summary>
+        /// Get a Token by symbol
+        /// </summary>
+        /// <param name="symbol">Symbol of token</param>
+        /// <returns>Token object</returns>
+        Token GetTokenBySymbol(string symbol);
+
+        /// <summary>
+        /// Get a token by hash
+        /// </summary>
+        /// <param name="hash">Hash of token</param>
+        /// <returns>Token symbol value</returns>
+        string GetTokenByHash(string hash);
 
         /// <summary>
         /// Get available currency pairs on Switcheo Exchange 

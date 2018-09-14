@@ -109,7 +109,7 @@ namespace SwitcheoApi.NetCore.Data
             _restRepo = new RESTRepository();
             _security = new Security();
             _txnProcessor = new TransactionProcessor();
-            _tokens = GetTokenList();
+            _tokens = GetTokens();
             _blockchain = blockchain;
             _contract_version = version;
             _contract_hash = GetContractHash();
@@ -175,7 +175,19 @@ namespace SwitcheoApi.NetCore.Data
         /// Retrieve a list of supported tokens on Switcheo.
         /// </summary>
         /// <returns>Tokens dictionary</returns>
-        public async Task<Dictionary<string, Token>> GetTokens()
+        public Dictionary<string, Token> GetTokens()
+        {
+            if (_tokens.Any())
+                return _tokens;
+            else
+                return OnGetTokens().Result;
+        }
+
+        /// <summary>
+        /// Retrieve a list of supported tokens on Switcheo.
+        /// </summary>
+        /// <returns>Tokens dictionary</returns>
+        private async Task<Dictionary<string, Token>> OnGetTokens()
         {
             var endpoint = "/v2/exchange/tokens";
 
@@ -191,6 +203,26 @@ namespace SwitcheoApi.NetCore.Data
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Get a Token by symbol
+        /// </summary>
+        /// <param name="symbol">Symbol of token</param>
+        /// <returns>Token object</returns>
+        public Token GetTokenBySymbol(string symbol)
+        {
+            return !string.IsNullOrEmpty(symbol) ? _tokens[symbol] : null;
+        }
+        
+        /// <summary>
+        /// Get a token by hash
+        /// </summary>
+        /// <param name="hash">Hash of token</param>
+        /// <returns>Token symbol value</returns>
+        public string GetTokenByHash(string hash)
+        {
+            return !string.IsNullOrEmpty(hash) ? _tokens.FirstOrDefault(t => t.Value.hash.Equals(hash)).Key : null;
         }
 
         /// <summary>
@@ -382,7 +414,7 @@ namespace SwitcheoApi.NetCore.Data
             var offers = await GetOffers(pair);
 
             var offerList = offers.ToList();
-            var orderBookList = offerList.Select(o => new SwitcheoOrder
+            var orderBookList = offerList.Select(o => new SwitcheoOffer
             {
                 available_amount = _helper.DeCalculateAmount(pair, o.available_amount, _tokens),
                 id = o.id,
@@ -691,7 +723,7 @@ namespace SwitcheoApi.NetCore.Data
         {
             var withdrawal = await CreateWithdrawal(asset, amount);
 
-            string execution = null;// await ExecuteWithdrawal(withdrawal);
+            var execution = await ExecuteWithdrawal(withdrawal);
 
             return execution == null ? false : true;
         }
@@ -766,7 +798,7 @@ namespace SwitcheoApi.NetCore.Data
                 throw new Exception(ex.Message);
             }
         }
-
+        
         /// <summary>
         /// Get an Order by Id
         /// </summary>
@@ -843,6 +875,36 @@ namespace SwitcheoApi.NetCore.Data
         public async Task<Order[]> GetOrders(string address, string pair)
         {
             return await OnGetOrders(address, pair);
+        }
+
+        private async Task<SwitcheoOrder[]> OnGetSwitcheoOrders(string address, string pair = "")
+        {
+            var orders = await OnGetOrders(address, pair);
+            
+            var orderList = orders.ToList();
+            var switcheoOrderList = orderList.Select(o => new SwitcheoOrder
+            {
+                address = o.address,
+                avgFillPrice = o.fills.Sum(f => decimal.Parse(f.price)),
+                createdAt = o.created_at,
+                blockchain = o.blockchain,
+                feeAmount = o.fills.Sum(f => decimal.Parse(f.fee_amount)),
+                feeAsset = GetTokenByHash(o.fills.Select(f => f.fee_asset_id).FirstOrDefault()),
+                filledQuanity = o.fills.Sum(f => decimal.Parse(f.filled_amount)),
+                offerAsset = GetTokenByHash(o.offer_asset_id),
+                orderStatus = o.order_status,
+                originalQuantity = decimal.Parse(o.offer_amount),
+                offerAmount = _helper.DeCalculateAmount(decimal.Parse(o.offer_amount)),
+                remainingQuantity = o.makes.Sum(m => decimal.Parse(m.offer_amount)),
+                side = o.side,
+                status = o.status,
+                useSWTH = o.use_native_token,
+                wantAmount = _helper.DeCalculateAmount(decimal.Parse(o.want_amount)),
+                wantAsset = GetTokenByHash(o.want_asset_id),
+                id = o.id,
+            }).ToList();
+
+            return switcheoOrderList.ToArray();
         }
 
         /// <summary>
@@ -1246,17 +1308,6 @@ namespace SwitcheoApi.NetCore.Data
             var signature = _security.SignTransaction(serializedTxn, _neoWallet);
 
             return signature;
-        }
-
-        /// <summary>
-        /// Get all tokens supported by the exchange
-        /// </summary>
-        /// <returns>Dictionary of tokens</returns>
-        private Dictionary<string, Token> GetTokenList()
-        {
-            var tokens = GetTokens().Result;
-
-            return tokens;
         }
 
         /// <summary>

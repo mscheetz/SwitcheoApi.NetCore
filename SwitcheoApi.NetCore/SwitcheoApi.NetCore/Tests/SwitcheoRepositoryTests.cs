@@ -48,13 +48,85 @@ namespace SwitcheoApi.NetCore.Data.Tests
 
             Assert.NotNull(pairs);
         }
-
+        
         [Fact]
         public void GetTokens_Test()
         {
-            var tokens = _repo.GetTokens().Result;
+            var tokens = _repo.GetTokens();
 
             Assert.True(tokens.Count > 0);
+        }
+
+        [Fact]
+        public void GetTokenBySymbol_Test()
+        {
+            var symbol = "NEO";
+            var token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+
+            symbol = "GAS";
+            token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+
+            symbol = "SWTH";
+            token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+
+            symbol = "DBC";
+            token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+        }
+
+        [Fact]
+        public void GetTokenByHash_Test()
+        {
+            var symbol = "NEO";
+            var token = _repo.GetTokenBySymbol(symbol);
+
+            if(token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
+
+            symbol = "GAS";
+            token = _repo.GetTokenBySymbol(symbol);
+            
+            if (token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
+
+            symbol = "SWTH";
+            token = _repo.GetTokenBySymbol(symbol);
+            
+            if (token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
+
+            symbol = "DBC";
+            token = _repo.GetTokenBySymbol(symbol);
+            
+            if (token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
         }
 
         [Fact]

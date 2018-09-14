@@ -92,7 +92,7 @@ namespace Switcheo.NetCore
         /// <returns>Tokens dictionary</returns>
         public Dictionary<string, Token> GetTokens()
         {
-            return _repository.GetTokens().Result;
+            return _repository.GetTokens();
         }
 
         /// <summary>
@@ -519,15 +519,6 @@ namespace Switcheo.NetCore
         public long GetServerTime()
         {
             return _repository.GetServerTime().Result;
-        }
-        
-        /// <summary>
-        /// Retrieve a list of supported tokens on Switcheo.
-        /// </summary>
-        /// <returns>Tokens dictionary</returns>
-        public async Task<Dictionary<string, Token>> GetTokensAsync()
-        {
-            return await _repository.GetTokens();
         }
 
         /// <summary>
