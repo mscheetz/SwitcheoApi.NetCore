@@ -8,21 +8,21 @@
     <PackageTags>switcheo exchange cryptocurrency neo blockchain</PackageTags>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.2.4</Version>
-    <PackageReleaseNotes>Streamlined orderbook endpoint</PackageReleaseNotes>
+    <Version>1.2.5</Version>
+    <PackageReleaseNotes>New Order endpoints: OpenOrders, CompletedOrders, Order by id / Specify blockchain</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/mscheetz/SwitcheoApi.NetCore/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>2018 Matt Scheetz</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DateTimeHelpers" Version="1.1.0" />
+    <PackageReference Include="DateTimeHelpers" Version="1.2.0" />
     <PackageReference Include="Neo" Version="2.8.0" />
     <PackageReference Include="NeoModules.Core" Version="0.0.3" />
     <PackageReference Include="NeoModules.NEP6" Version="0.0.27" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.2" />
-    <PackageReference Include="RESTApiAccess" Version="1.0.0" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.3" />
+    <PackageReference Include="RESTApiAccess" Version="1.1.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>

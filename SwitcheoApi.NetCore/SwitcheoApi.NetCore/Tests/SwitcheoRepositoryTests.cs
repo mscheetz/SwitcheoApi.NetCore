@@ -215,7 +215,7 @@ namespace SwitcheoApi.NetCore.Data.Tests
         public void GetTradesToDateOnly_Test()
         {
             var pair = "SWTH_NEO";
-            var to = new DateTimeOffset(2018, 7, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
+            var to = new DateTimeOffset(2018, 8, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
             var trades = _repo.GetTrades(pair, null, to).Result;
 
             Assert.True(trades.Length > 0);
@@ -266,6 +266,44 @@ namespace SwitcheoApi.NetCore.Data.Tests
             var deposit = _repoAuth.CreateDeposit(asset, amount).Result;
 
             Assert.NotNull(deposit);
+        }
+
+        [Fact]
+        public void GetOrder_Test()
+        {
+            var orders = _repoAuth.GetOrders().Result;
+
+            if(orders!= null && orders.Length > 0)
+            {
+                var id = orders.First().id;
+                var order = _repoAuth.GetOrder(id).Result;
+
+                Assert.NotNull(order);
+            }
+        }
+
+        [Fact]
+        public void GetOpenOrders_Test()
+        {
+            var orders = _repoAuth.GetOpenOrders().Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
+        public void GetCompletedOrders_Test()
+        {
+            var orders = _repoAuth.GetCompletedOrders().Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
+        public void GetOrders_Test()
+        {
+            var orders = _repoAuth.GetOrders().Result;
+
+            Assert.NotNull(orders);
         }
 
         [Fact]

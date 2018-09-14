@@ -179,7 +179,26 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// <param name="withdrawalId">Guid of withdrawal request</param>
         /// <returns>Withdrawal response</returns>
         Task<WithdrawalResponse> ExecuteWithdrawal(string withdrawalId);
-        
+
+        /// <summary>
+        /// Get an Order by Id
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns>Order object</returns>
+        Task<Order> GetOrder(string id);
+
+        /// <summary>
+        /// Get all open Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        Task<Order[]> GetOpenOrders();
+
+        /// <summary>
+        /// Get all completed Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        Task<Order[]> GetCompletedOrders();
+
         /// <summary>
         /// Get orders for current address
         /// </summary>
