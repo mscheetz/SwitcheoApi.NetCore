@@ -16,6 +16,13 @@ namespace SwitcheoApi.NetCore.Entities
         public string publicKey { get; set; }
         public byte[] privateKey { get; set; }
         public KeyPair keyPair { get; set; }
+        public string exchangeAddress
+        {
+            get
+            {
+                return string.IsNullOrEmpty(scriptHash) ? "" : scriptHash.Substring(2);
+            }
+        }
 
         /// <summary>
         /// Constructor to set address

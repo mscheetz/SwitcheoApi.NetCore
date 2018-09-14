@@ -20,6 +20,7 @@ namespace SwitcheoApi.NetCore.Entities
         public string deposit_txn { get; set; }
         public DateTimeOffset created_at { get; set; }
         public string status { get; set; }
+        public string order_status { get; set; }
         public Fill[] fills { get; set; }
         public Make[] makes { get; set; }
     }
