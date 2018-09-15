@@ -344,6 +344,16 @@ namespace Switcheo.NetCore
         }
 
         /// <summary>
+        /// Get orders for current address for a given trading pair in human readable format
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public SwitcheoOrder[] GetSwitcheoOrders(string pair)
+        {
+            return _repository.GetSwitcheoOrders(pair).Result;
+        }
+
+        /// <summary>
         /// Get all open Orders in human readable format
         /// </summary>
         /// <returns>Array of SwitcheoOrder objects</returns>
@@ -804,6 +814,16 @@ namespace Switcheo.NetCore
         public async Task<SwitcheoOrder[]> GetSwitcheoOrdersAsync()
         {
             return await _repository.GetSwitcheoOrders();
+        }
+
+        /// <summary>
+        /// Get orders for current address for a given trading pair in human readable format
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetSwitcheoOrdersAsync(string pair)
+        {
+            return await _repository.GetSwitcheoOrders(pair);
         }
 
         /// <summary>

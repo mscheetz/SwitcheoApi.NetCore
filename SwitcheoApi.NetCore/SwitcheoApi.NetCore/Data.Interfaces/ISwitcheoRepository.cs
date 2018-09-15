@@ -208,6 +208,13 @@ namespace SwitcheoApi.NetCore.Data.Interface
         Task<SwitcheoOrder[]> GetSwitcheoOrders();
 
         /// <summary>
+        /// Get orders for current address for a given trading pair in human readable format
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        Task<SwitcheoOrder[]> GetSwitcheoOrders(string pair);
+
+        /// <summary>
         /// Get all open Orders in human readable format
         /// </summary>
         /// <returns>Array of SwitcheoOrder objects</returns>

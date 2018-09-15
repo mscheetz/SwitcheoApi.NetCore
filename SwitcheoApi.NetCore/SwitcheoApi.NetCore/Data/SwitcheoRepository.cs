@@ -825,6 +825,20 @@ namespace SwitcheoApi.NetCore.Data
         }
 
         /// <summary>
+        /// Get orders for current address for a given trading pair in human readable format
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetSwitcheoOrders(string pair)
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            var orders = await OnGetSwitcheoOrders(address);
+
+            return orders.Where(o => o.pair.Equals(pair)).ToArray();
+        }
+
+        /// <summary>
         /// Get all open Orders in human readable format
         /// </summary>
         /// <returns>Array of SwitcheoOrder objects</returns>

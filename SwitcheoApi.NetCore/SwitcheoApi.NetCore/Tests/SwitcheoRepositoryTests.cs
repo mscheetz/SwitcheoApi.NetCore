@@ -355,6 +355,15 @@ namespace SwitcheoApi.NetCore.Data.Tests
         }
 
         [Fact]
+        public void GetSwitcheoOrdersPair_Test()
+        {
+            var pair = "SWTH_NEO";
+            var orders = _repoAuth.GetSwitcheoOrders(pair).Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
         public void GetSwitcheoOrders_Test()
         {
             var orders = _repoAuth.GetSwitcheoOrders().Result;
