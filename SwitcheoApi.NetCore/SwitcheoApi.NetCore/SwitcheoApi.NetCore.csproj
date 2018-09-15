@@ -8,8 +8,8 @@
     <PackageTags>switcheo exchange cryptocurrency neo blockchain</PackageTags>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.2.5</Version>
-    <PackageReleaseNotes>New Order endpoints: OpenOrders, CompletedOrders, Order by id / Specify blockchain</PackageReleaseNotes>
+    <Version>1.2.6</Version>
+    <PackageReleaseNotes>New SwitcheoOrder endpoints</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/mscheetz/SwitcheoApi.NetCore/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>2018 Matt Scheetz</Copyright>

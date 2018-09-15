@@ -341,6 +341,44 @@ namespace SwitcheoApi.NetCore.Data.Tests
         }
 
         [Fact]
+        public void GetSwitcheoOrder_Test()
+        {
+            var orders = _repoAuth.GetSwitcheoOrders().Result;
+
+            if (orders != null && orders.Length > 0)
+            {
+                var id = orders.First().id;
+                var order = _repoAuth.GetSwitcheoOrder(id).Result;
+
+                Assert.NotNull(order);
+            }
+        }
+
+        [Fact]
+        public void GetSwitcheoOrders_Test()
+        {
+            var orders = _repoAuth.GetSwitcheoOrders().Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
+        public void GetOpenSwitcheoOrders_Test()
+        {
+            var orders = _repoAuth.GetOpenSwitcheoOrders().Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
+        public void GetCompletedSwitcheoOrders_Test()
+        {
+            var orders = _repoAuth.GetCompletedSwitcheoOrders().Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
         public void GetOrder_Test()
         {
             var orders = _repoAuth.GetOrders().Result;

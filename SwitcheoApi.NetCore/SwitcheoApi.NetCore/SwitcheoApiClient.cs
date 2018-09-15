@@ -325,6 +325,43 @@ namespace Switcheo.NetCore
         }
 
         /// <summary>
+        /// Get an Order by Id in human readable format
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns>SwitcheoOrder object</returns>
+        public SwitcheoOrder GetSwitcheoOrder(string id)
+        {
+            return _repository.GetSwitcheoOrder(id).Result;
+        }
+
+        /// <summary>
+        /// Get orders for current address in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public SwitcheoOrder[] GetSwitcheoOrders()
+        {
+            return _repository.GetSwitcheoOrders().Result;
+        }
+
+        /// <summary>
+        /// Get all open Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public SwitcheoOrder[] GetOpenSwitcheoOrders()
+        {
+            return _repository.GetOpenSwitcheoOrders().Result;
+        }
+
+        /// <summary>
+        /// Get all completed Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public SwitcheoOrder[] GetCompletedSwitcheoOrders()
+        {
+            return _repository.GetCompletedSwitcheoOrders().Result;
+        }
+
+        /// <summary>
         /// Get an Order by Id
         /// </summary>
         /// <param name="id">Order Id</param>
@@ -748,6 +785,43 @@ namespace Switcheo.NetCore
         public async Task<WithdrawalResponse> ExecuteWithdrawalAsync(string withdrawalId)
         {
             return await _repository.ExecuteWithdrawal(withdrawalId);
+        }
+
+        /// <summary>
+        /// Get an Order by Id in human readable format
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns>SwitcheoOrder object</returns>
+        public async Task<SwitcheoOrder> GetSwitcheoOrderAsync(string id)
+        {
+            return await _repository.GetSwitcheoOrder(id);
+        }
+
+        /// <summary>
+        /// Get orders for current address in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetSwitcheoOrdersAsync()
+        {
+            return await _repository.GetSwitcheoOrders();
+        }
+
+        /// <summary>
+        /// Get all open Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetOpenSwitcheoOrdersAsync()
+        {
+            return await _repository.GetOpenSwitcheoOrders();
+        }
+
+        /// <summary>
+        /// Get all completed Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetCompletedSwitcheoOrdersAsync()
+        {
+            return await _repository.GetCompletedSwitcheoOrders();
         }
 
         /// <summary>

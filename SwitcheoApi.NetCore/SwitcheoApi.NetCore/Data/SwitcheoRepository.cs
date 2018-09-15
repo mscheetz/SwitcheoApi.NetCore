@@ -798,15 +798,72 @@ namespace SwitcheoApi.NetCore.Data
                 throw new Exception(ex.Message);
             }
         }
-        
+
         /// <summary>
-        /// Get an Order by Id
+        /// Get an Order by Id in human readable format
         /// </summary>
         /// <param name="id">Order Id</param>
+        /// <returns>SwitcheoOrder object</returns>
+        public async Task<SwitcheoOrder> GetSwitcheoOrder(string id)
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            var orders = await OnGetSwitcheoOrders(address);
+
+            return orders.Where(o => o.id.Equals(id)).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Get orders for current address in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetSwitcheoOrders()
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            return await OnGetSwitcheoOrders(address);
+        }
+
+        /// <summary>
+        /// Get all open Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetOpenSwitcheoOrders()
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            var orders = await OnGetSwitcheoOrders(address);
+
+            var openOrders = orders.Where(o => !string.IsNullOrEmpty(o.orderStatus)
+                                                && o.orderStatus.Equals("open")).ToList();
+
+            return openOrders.ToArray();
+        }
+
+        /// <summary>
+        /// Get all completed Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        public async Task<SwitcheoOrder[]> GetCompletedSwitcheoOrders()
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            var orders = await OnGetSwitcheoOrders(address);
+
+            var openOrders = orders.Where(o => !string.IsNullOrEmpty(o.orderStatus)
+                                                && o.orderStatus.Equals("completed")).ToList();
+
+            return openOrders.ToArray();
+        }
+
+        /// <summary>
+        /// Get an order by order id
+        /// </summary>
+        /// <param name="id">Order id</param>
         /// <returns>Order object</returns>
         public async Task<Order> GetOrder(string id)
         {
-            var address = _neoWallet.exchangeAddress;
+            var address = _neoWallet.address;
 
             var orders = await OnGetOrders(address);
 
@@ -846,20 +903,6 @@ namespace SwitcheoApi.NetCore.Data
         }
 
         /// <summary>
-        /// Get an order by order id
-        /// </summary>
-        /// <param name="id">Order id</param>
-        /// <returns>Order object</returns>
-        public async Task<Order> GetOrder(string id)
-        {
-            var address = _neoWallet.address;
-
-            var orders = await OnGetOrders(address);
-
-            return orders.Where(o => o.id.Equals(id)).FirstOrDefault();
-        }
-
-        /// <summary>
         /// Get orders for current address
         /// </summary>
         /// <returns>Array of orders</returns>
@@ -891,6 +934,12 @@ namespace SwitcheoApi.NetCore.Data
             return await OnGetOrders(address, pair);
         }
 
+        /// <summary>
+        /// Get Orders in human readable format
+        /// </summary>
+        /// <param name="address">Address with orders</param>
+        /// <param name="pair">String of pair to match</param>
+        /// <returns>Array of SwitcheoOrder objects</returns>
         private async Task<SwitcheoOrder[]> OnGetSwitcheoOrders(string address, string pair = "")
         {
             var orders = await OnGetOrders(address, pair);
@@ -899,17 +948,17 @@ namespace SwitcheoApi.NetCore.Data
             var switcheoOrderList = orderList.Select(o => new SwitcheoOrder
             {
                 address = o.address,
-                avgFillPrice = o.fills.Sum(f => decimal.Parse(f.price)),
+                avgFillPrice = o.fills != null ? o.fills.Sum(f => decimal.Parse(f.price)) : 0M,
                 createdAt = o.created_at,
                 blockchain = o.blockchain,
-                feeAmount = o.fills.Sum(f => decimal.Parse(f.fee_amount)),
-                feeAsset = GetTokenByHash(o.fills.Select(f => f.fee_asset_id).FirstOrDefault()),
-                filledQuanity = o.fills.Sum(f => decimal.Parse(f.filled_amount)),
+                feeAmount = o.fills != null ? o.fills.Sum(f => decimal.Parse(f.fee_amount)) : 0M,
+                feeAsset = !o.use_native_token ? GetTokenByHash(o.offer_asset_id) : "SWTH",
+                filledQuanity = o.fills != null ? o.fills.Sum(f => decimal.Parse(f.fill_amount)) : 0M,
                 offerAsset = GetTokenByHash(o.offer_asset_id),
                 orderStatus = o.order_status,
-                originalQuantity = decimal.Parse(o.offer_amount),
+                originalQuantity = _helper.DeCalculateAmount(decimal.Parse(o.offer_amount)),
                 offerAmount = _helper.DeCalculateAmount(decimal.Parse(o.offer_amount)),
-                remainingQuantity = o.makes.Sum(m => decimal.Parse(m.offer_amount)),
+                remainingQuantity = o.makes != null ? _helper.DeCalculateAmount(o.makes.Sum(m => decimal.Parse(m.offer_amount))) : _helper.DeCalculateAmount(decimal.Parse(o.offer_amount)),
                 side = o.side,
                 status = o.status,
                 useSWTH = o.use_native_token,

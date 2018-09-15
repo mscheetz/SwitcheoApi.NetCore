@@ -195,6 +195,31 @@ namespace SwitcheoApi.NetCore.Data.Interface
         Task<WithdrawalResponse> ExecuteWithdrawal(string withdrawalId);
 
         /// <summary>
+        /// Get an Order by Id in human readable format
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns>SwitcheoOrder object</returns>
+        Task<SwitcheoOrder> GetSwitcheoOrder(string id);
+
+        /// <summary>
+        /// Get orders for current address in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        Task<SwitcheoOrder[]> GetSwitcheoOrders();
+
+        /// <summary>
+        /// Get all open Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        Task<SwitcheoOrder[]> GetOpenSwitcheoOrders();
+
+        /// <summary>
+        /// Get all completed Orders in human readable format
+        /// </summary>
+        /// <returns>Array of SwitcheoOrder objects</returns>
+        Task<SwitcheoOrder[]> GetCompletedSwitcheoOrders();
+        
+        /// <summary>
         /// Get an Order by Id
         /// </summary>
         /// <param name="id">Order Id</param>
