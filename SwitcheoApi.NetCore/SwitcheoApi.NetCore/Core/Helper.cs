@@ -208,5 +208,36 @@ namespace SwitcheoApi.NetCore.Core
             
             return val;
         }
+
+        /// <summary>
+        /// DeCalculate transaction amount to post
+        /// </summary>
+        /// <param name="amount">Amount to convert</param>
+        /// <param name="tokens">Token to calculate</param>
+        /// <returns>Decimal of converted amount</returns>
+        public decimal DeCalculateAmount(decimal amount, Token token)
+        {
+            double pow = (double)token.decimals;
+            var multiplier = (decimal)Math.Pow(10.00, pow);
+
+            var val = amount / multiplier;
+
+            return val;
+        }
+
+        /// <summary>
+        /// DeCalculate transaction amount to post
+        /// </summary>
+        /// <param name="amount">Amount to convert</param>
+        /// <param name="pow">Decimal precision</param>
+        /// <returns>Decimal of converted amount</returns>
+        public decimal DeCalculateAmount(decimal amount, double pow = 8)
+        {
+            var multiplier = (decimal)Math.Pow(10.00, pow);
+
+            var val = amount / multiplier;
+
+            return val;
+        }
     }
 }

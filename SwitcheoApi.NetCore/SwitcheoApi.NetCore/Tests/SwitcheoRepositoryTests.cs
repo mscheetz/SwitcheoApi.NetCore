@@ -48,13 +48,85 @@ namespace SwitcheoApi.NetCore.Data.Tests
 
             Assert.NotNull(pairs);
         }
-
+        
         [Fact]
         public void GetTokens_Test()
         {
-            var tokens = _repo.GetTokens().Result;
+            var tokens = _repo.GetTokens();
 
             Assert.True(tokens.Count > 0);
+        }
+
+        [Fact]
+        public void GetTokenBySymbol_Test()
+        {
+            var symbol = "NEO";
+            var token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+
+            symbol = "GAS";
+            token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+
+            symbol = "SWTH";
+            token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+
+            symbol = "DBC";
+            token = _repo.GetTokenBySymbol(symbol);
+
+            Assert.NotNull(token);
+        }
+
+        [Fact]
+        public void GetTokenByHash_Test()
+        {
+            var symbol = "NEO";
+            var token = _repo.GetTokenBySymbol(symbol);
+
+            if(token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
+
+            symbol = "GAS";
+            token = _repo.GetTokenBySymbol(symbol);
+            
+            if (token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
+
+            symbol = "SWTH";
+            token = _repo.GetTokenBySymbol(symbol);
+            
+            if (token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
+
+            symbol = "DBC";
+            token = _repo.GetTokenBySymbol(symbol);
+            
+            if (token != null)
+            {
+                var hash = token.hash;
+                var tokenSymbol = _repo.GetTokenByHash(hash);
+
+                Assert.True(symbol == tokenSymbol);
+            }
         }
 
         [Fact]
@@ -215,7 +287,7 @@ namespace SwitcheoApi.NetCore.Data.Tests
         public void GetTradesToDateOnly_Test()
         {
             var pair = "SWTH_NEO";
-            var to = new DateTimeOffset(2018, 7, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
+            var to = new DateTimeOffset(2018, 8, 17, 2, 18, 00, TimeSpan.FromSeconds(0));
             var trades = _repo.GetTrades(pair, null, to).Result;
 
             Assert.True(trades.Length > 0);
@@ -266,6 +338,36 @@ namespace SwitcheoApi.NetCore.Data.Tests
             var deposit = _repoAuth.CreateDeposit(asset, amount).Result;
 
             Assert.NotNull(deposit);
+        }
+
+        [Fact]
+        public void GetOrder_Test()
+        {
+            var orders = _repoAuth.GetOrders().Result;
+
+            if(orders!= null && orders.Length > 0)
+            {
+                var id = orders.First().id;
+                var order = _repoAuth.GetOrder(id).Result;
+
+                Assert.NotNull(order);
+            }
+        }
+
+        [Fact]
+        public void GetOpenOrders_Test()
+        {
+            var orders = _repoAuth.GetOpenOrders().Result;
+
+            Assert.NotNull(orders);
+        }
+
+        [Fact]
+        public void GetCompletedOrders_Test()
+        {
+            var orders = _repoAuth.GetCompletedOrders().Result;
+
+            Assert.NotNull(orders);
         }
 
         [Fact]

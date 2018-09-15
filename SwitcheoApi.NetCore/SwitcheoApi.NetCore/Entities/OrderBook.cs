@@ -6,7 +6,7 @@ namespace SwitcheoApi.NetCore.Entities
 {
     public class OrderBook
     {
-        public SwitcheoOrder[] bids { get; set; }
-        public SwitcheoOrder[] asks { get; set; }
+        public SwitcheoOffer[] bids { get; set; }
+        public SwitcheoOffer[] asks { get; set; }
     }
 }

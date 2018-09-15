@@ -28,17 +28,29 @@ namespace Switcheo.NetCore
         /// <param name="loginValue">Neo public address or private key</param>
         public SwitcheoApiClient(string loginValue)
         {
-            _repository = new SwitcheoRepository(loginValue, false);
+            _repository = new SwitcheoRepository(loginValue, false, "", Blockchain.neo);
+        }
+
+        /// <summary>
+        /// Constructor, with authorization
+        /// </summary>
+        /// <param name="loginValue">Neo public address or private key</param>
+        /// <param name="blockchain">Blockchain (neo, eth, qtum)</param>
+        public SwitcheoApiClient(string loginValue, Blockchain blockchain)
+        {
+            _repository = new SwitcheoRepository(loginValue, false, "", blockchain);
         }
 
         /// <summary>
         /// Constructor, no authorization
         /// </summary>
         /// <param name="testRegion">Boolean to use test region (default = false)</param>
-        public SwitcheoApiClient(bool testRegion = false)
+        /// <param name="version">Contract version (default latest)</param>
+        /// <param name="blockchain">Blockchain (default = neo)</param>
+        public SwitcheoApiClient(bool testRegion = false, string version = "", Blockchain blockchain = Blockchain.neo)
         {
-            _switcheoRepository = new SwitcheoRepository(testRegion);
-            _repository = new SwitcheoRepository(testRegion);
+            _switcheoRepository = new SwitcheoRepository(testRegion, version, blockchain);
+            _repository = new SwitcheoRepository(testRegion, version, blockchain);
         }
 
         /// <summary>
@@ -46,9 +58,23 @@ namespace Switcheo.NetCore
         /// </summary>
         /// <param name="loginValue">Neo public address or private key</param>
         /// <param name="testRegion">Boolean to use test region (default = false)</param>
-        public SwitcheoApiClient(string loginValue, bool testRegion = false)
+        /// <param name="version">Contract version (default latest)</param>
+        /// <param name="blockchain">Blockchain (default = neo)</param>
+        public SwitcheoApiClient(string loginValue, bool testRegion = false, Blockchain blockchain = Blockchain.neo)
         {
-            _repository = new SwitcheoRepository(loginValue, testRegion);
+            _repository = new SwitcheoRepository(loginValue, testRegion, "", blockchain);
+        }
+
+        /// <summary>
+        /// Constructor, with authorization
+        /// </summary>
+        /// <param name="loginValue">Neo public address or private key</param>
+        /// <param name="testRegion">Boolean to use test region (default = false)</param>
+        /// <param name="version">Contract version (default latest)</param>
+        /// <param name="blockchain">Blockchain (default = neo)</param>
+        public SwitcheoApiClient(string loginValue, bool testRegion = false, string version = "", Blockchain blockchain = Blockchain.neo)
+        {
+            _repository = new SwitcheoRepository(loginValue, testRegion, version, blockchain);
         }
 
         /// <summary>
@@ -66,7 +92,7 @@ namespace Switcheo.NetCore
         /// <returns>Tokens dictionary</returns>
         public Dictionary<string, Token> GetTokens()
         {
-            return _repository.GetTokens().Result;
+            return _repository.GetTokens();
         }
 
         /// <summary>
@@ -299,6 +325,34 @@ namespace Switcheo.NetCore
         }
 
         /// <summary>
+        /// Get an Order by Id
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns>Order object</returns>
+        public Order GetOrder(string id)
+        {
+            return _repository.GetOrder(id).Result;
+        }
+
+        /// <summary>
+        /// Get all open Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        public Order[] GetOpenOrders()
+        {
+            return _repository.GetOpenOrders().Result;
+        }
+
+        /// <summary>
+        /// Get all completed Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        public Order[] GetCompletedOrders()
+        {
+            return _repository.GetCompletedOrders().Result;
+        }
+
+        /// <summary>
         /// Get orders for current address
         /// </summary>
         /// <param name="address">Address with orders</param>
@@ -465,15 +519,6 @@ namespace Switcheo.NetCore
         public long GetServerTime()
         {
             return _repository.GetServerTime().Result;
-        }
-        
-        /// <summary>
-        /// Retrieve a list of supported tokens on Switcheo.
-        /// </summary>
-        /// <returns>Tokens dictionary</returns>
-        public async Task<Dictionary<string, Token>> GetTokensAsync()
-        {
-            return await _repository.GetTokens();
         }
 
         /// <summary>
@@ -703,6 +748,34 @@ namespace Switcheo.NetCore
         public async Task<WithdrawalResponse> ExecuteWithdrawalAsync(string withdrawalId)
         {
             return await _repository.ExecuteWithdrawal(withdrawalId);
+        }
+
+        /// <summary>
+        /// Get an Order by Id
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> GetOrderAsync(string id)
+        {
+            return await _repository.GetOrder(id);
+        }
+
+        /// <summary>
+        /// Get all open Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        public async Task<Order[]> GetOpenOrdersAsync()
+        {
+            return await _repository.GetOpenOrders();
+        }
+
+        /// <summary>
+        /// Get all completed Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        public async Task<Order[]> GetCompletedOrdersAsync()
+        {
+            return await _repository.GetCompletedOrders();
         }
 
         /// <summary>

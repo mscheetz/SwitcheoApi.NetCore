@@ -11,7 +11,21 @@ namespace SwitcheoApi.NetCore.Data.Interface
         /// Retrieve a list of supported tokens on Switcheo.
         /// </summary>
         /// <returns>Tokens dictionary</returns>
-        Task<Dictionary<string, Token>> GetTokens();
+        Dictionary<string, Token> GetTokens();
+
+        /// <summary>
+        /// Get a Token by symbol
+        /// </summary>
+        /// <param name="symbol">Symbol of token</param>
+        /// <returns>Token object</returns>
+        Token GetTokenBySymbol(string symbol);
+
+        /// <summary>
+        /// Get a token by hash
+        /// </summary>
+        /// <param name="hash">Hash of token</param>
+        /// <returns>Token symbol value</returns>
+        string GetTokenByHash(string hash);
 
         /// <summary>
         /// Get available currency pairs on Switcheo Exchange 
@@ -181,11 +195,23 @@ namespace SwitcheoApi.NetCore.Data.Interface
         Task<WithdrawalResponse> ExecuteWithdrawal(string withdrawalId);
 
         /// <summary>
-        /// Get an order by order id
+        /// Get an Order by Id
         /// </summary>
-        /// <param name="id">Order id</param>
+        /// <param name="id">Order Id</param>
         /// <returns>Order object</returns>
         Task<Order> GetOrder(string id);
+
+        /// <summary>
+        /// Get all open Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        Task<Order[]> GetOpenOrders();
+
+        /// <summary>
+        /// Get all completed Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        Task<Order[]> GetCompletedOrders();
 
         /// <summary>
         /// Get orders for current address

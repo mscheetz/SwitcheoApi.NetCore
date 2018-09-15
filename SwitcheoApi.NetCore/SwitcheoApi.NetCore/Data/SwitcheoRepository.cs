@@ -16,6 +16,7 @@ namespace SwitcheoApi.NetCore.Data
     {
         private string _baseUrl = "https://api.switcheo.network";
         private IRESTRepository _restRepo;
+        private Blockchain _blockchain;
         private Helper _helper;
         private DateTimeHelper _dtHelper;
         private TransactionProcessor _txnProcessor;
@@ -34,16 +35,24 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         public SwitcheoRepository()
         {
-            LoadRepository("", false, "");
+            LoadRepository("", false, "", Blockchain.neo);
+        }
+
+        /// <summary>
+        /// Constructor for non-auth apis
+        /// </summary>
+        public SwitcheoRepository(Blockchain blockchain = Blockchain.neo)
+        {
+            LoadRepository("", false, "", blockchain);
         }
 
         /// <summary>
         /// Constructor for non-auth apis
         /// </summary>
         /// <param name="version">Contract version (default = "")</param>
-        public SwitcheoRepository(string version = "")
+        public SwitcheoRepository(string version = "", Blockchain blockchain = Blockchain.neo)
         {
-            LoadRepository("", false, version);
+            LoadRepository("", false, version, blockchain);
         }
 
         /// <summary>
@@ -51,9 +60,9 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="loginValue">Neo public address or private key</param>
         /// <param name="version">Contract version (default = "")</param>
-        public SwitcheoRepository(string loginValue, string version = "")
+        public SwitcheoRepository(string loginValue, string version = "", Blockchain blockchain = Blockchain.neo)
         {
-            LoadRepository(loginValue, false, version);
+            LoadRepository(loginValue, false, version, blockchain);
         }
 
         /// <summary>
@@ -61,9 +70,9 @@ namespace SwitcheoApi.NetCore.Data
         /// </summary>
         /// <param name="testRegion">Use test region (default = false)</param>
         /// <param name="version">Contract version (default = "")</param>
-        public SwitcheoRepository(bool testRegion = false, string version = "")
+        public SwitcheoRepository(bool testRegion = false, string version = "", Blockchain blockchain = Blockchain.neo)
         {
-            LoadRepository("", testRegion, version);
+            LoadRepository("", testRegion, version, blockchain);
         }
 
         /// <summary>
@@ -72,14 +81,14 @@ namespace SwitcheoApi.NetCore.Data
         /// <param name="loginValue">Neo public address or private key</param>
         /// <param name="testRegion">Use test region (default = false)</param>
         /// <param name="version">Contract version (default = "")</param>
-        public SwitcheoRepository(string loginValue, bool testRegion = false, string version = "")
+        public SwitcheoRepository(string loginValue, bool testRegion = false, string version = "", Blockchain blockchain = Blockchain.neo)
         {
-            LoadRepository(loginValue, testRegion, version);
+            LoadRepository(loginValue, testRegion, version, blockchain);
         }
 
         #endregion Constructor/Destructor
 
-        private void LoadRepository(string addyPk, bool testRegion, string version)
+        private void LoadRepository(string addyPk, bool testRegion, string version, Blockchain blockchain)
         {
             _helper = new Helper();
             if (string.IsNullOrEmpty(addyPk))
@@ -100,7 +109,8 @@ namespace SwitcheoApi.NetCore.Data
             _restRepo = new RESTRepository();
             _security = new Security();
             _txnProcessor = new TransactionProcessor();
-            _tokens = GetTokenList();
+            _tokens = GetTokens();
+            _blockchain = blockchain;
             _contract_version = version;
             _contract_hash = GetContractHash();
             _dtHelper = new DateTimeHelper();
@@ -165,7 +175,19 @@ namespace SwitcheoApi.NetCore.Data
         /// Retrieve a list of supported tokens on Switcheo.
         /// </summary>
         /// <returns>Tokens dictionary</returns>
-        public async Task<Dictionary<string, Token>> GetTokens()
+        public Dictionary<string, Token> GetTokens()
+        {
+            if (_tokens.Any())
+                return _tokens;
+            else
+                return OnGetTokens().Result;
+        }
+
+        /// <summary>
+        /// Retrieve a list of supported tokens on Switcheo.
+        /// </summary>
+        /// <returns>Tokens dictionary</returns>
+        private async Task<Dictionary<string, Token>> OnGetTokens()
         {
             var endpoint = "/v2/exchange/tokens";
 
@@ -181,6 +203,26 @@ namespace SwitcheoApi.NetCore.Data
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Get a Token by symbol
+        /// </summary>
+        /// <param name="symbol">Symbol of token</param>
+        /// <returns>Token object</returns>
+        public Token GetTokenBySymbol(string symbol)
+        {
+            return !string.IsNullOrEmpty(symbol) ? _tokens[symbol] : null;
+        }
+        
+        /// <summary>
+        /// Get a token by hash
+        /// </summary>
+        /// <param name="hash">Hash of token</param>
+        /// <returns>Token symbol value</returns>
+        public string GetTokenByHash(string hash)
+        {
+            return !string.IsNullOrEmpty(hash) ? _tokens.FirstOrDefault(t => t.Value.hash.Equals(hash)).Key : null;
         }
 
         /// <summary>
@@ -372,7 +414,7 @@ namespace SwitcheoApi.NetCore.Data
             var offers = await GetOffers(pair);
 
             var offerList = offers.ToList();
-            var orderBookList = offerList.Select(o => new SwitcheoOrder
+            var orderBookList = offerList.Select(o => new SwitcheoOffer
             {
                 available_amount = _helper.DeCalculateAmount(pair, o.available_amount, _tokens),
                 id = o.id,
@@ -550,7 +592,7 @@ namespace SwitcheoApi.NetCore.Data
         /// <returns>Balance response</returns>
         public async Task<BalanceResponse> GetBalances()
         {
-            return await OnGetBalances(_neoWallet.scriptHash.Substring(2));
+            return await OnGetBalances(_neoWallet.exchangeAddress);
         }
 
         /// <summary>
@@ -622,13 +664,13 @@ namespace SwitcheoApi.NetCore.Data
 
             param.Add("amount", GetAmount(asset, amount));
             param.Add("asset_id", asset);
-            param.Add("blockchain", "neo");
+            param.Add("blockchain", _blockchain.ToString());
             param.Add("contract_hash", _contract_hash);
             param.Add("timestamp", timestamp);
 
             var signature = SignMessage(param);
 
-            param.Add("address", _neoWallet.scriptHash.Substring(2));
+            param.Add("address", _neoWallet.exchangeAddress);
             param.Add("signature", signature);
             
             var url = _baseUrl + endpoint;
@@ -681,7 +723,7 @@ namespace SwitcheoApi.NetCore.Data
         {
             var withdrawal = await CreateWithdrawal(asset, amount);
 
-            string execution = null;// await ExecuteWithdrawal(withdrawal);
+            var execution = await ExecuteWithdrawal(withdrawal);
 
             return execution == null ? false : true;
         }
@@ -701,13 +743,13 @@ namespace SwitcheoApi.NetCore.Data
 
             param.Add("amount", GetAmount(asset, amount));
             param.Add("asset_id", asset);
-            param.Add("blockchain", "neo");
+            param.Add("blockchain", _blockchain.ToString());
             param.Add("contract_hash", _contract_hash);
             param.Add("timestamp", timestamp);
 
             var signature = SignMessage(param);
 
-            param.Add("address", _neoWallet.scriptHash.Substring(2));
+            param.Add("address", _neoWallet.exchangeAddress);
             param.Add("signature", signature);
 
             var url = _baseUrl + endpoint;
@@ -756,6 +798,52 @@ namespace SwitcheoApi.NetCore.Data
                 throw new Exception(ex.Message);
             }
         }
+        
+        /// <summary>
+        /// Get an Order by Id
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns>Order object</returns>
+        public async Task<Order> GetOrder(string id)
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            var orders = await OnGetOrders(address);
+
+            return orders.Where(o => o.id.Equals(id)).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Get all open Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        public async Task<Order[]> GetOpenOrders()
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            var orders = await OnGetOrders(address);
+
+            var openOrders = orders.Where(o => !string.IsNullOrEmpty(o.order_status) 
+                                                && o.order_status.Equals("open")).ToList();
+
+            return openOrders.ToArray();
+        }
+
+        /// <summary>
+        /// Get all completed Orders
+        /// </summary>
+        /// <returns>Array of Order objects</returns>
+        public async Task<Order[]> GetCompletedOrders()
+        {
+            var address = _neoWallet.exchangeAddress;
+
+            var orders = await OnGetOrders(address);
+
+            var openOrders = orders.Where(o => !string.IsNullOrEmpty(o.order_status) 
+                                                && o.order_status.Equals("completed")).ToList();
+
+            return openOrders.ToArray();
+        }
 
         /// <summary>
         /// Get an order by order id
@@ -774,11 +862,10 @@ namespace SwitcheoApi.NetCore.Data
         /// <summary>
         /// Get orders for current address
         /// </summary>
-        /// <param name="address">Address with orders</param>
         /// <returns>Array of orders</returns>
         public async Task<Order[]> GetOrders()
         {
-            var address = _neoWallet.address;
+            var address = _neoWallet.exchangeAddress;
 
             return await OnGetOrders(address);
         }
@@ -804,6 +891,36 @@ namespace SwitcheoApi.NetCore.Data
             return await OnGetOrders(address, pair);
         }
 
+        private async Task<SwitcheoOrder[]> OnGetSwitcheoOrders(string address, string pair = "")
+        {
+            var orders = await OnGetOrders(address, pair);
+            
+            var orderList = orders.ToList();
+            var switcheoOrderList = orderList.Select(o => new SwitcheoOrder
+            {
+                address = o.address,
+                avgFillPrice = o.fills.Sum(f => decimal.Parse(f.price)),
+                createdAt = o.created_at,
+                blockchain = o.blockchain,
+                feeAmount = o.fills.Sum(f => decimal.Parse(f.fee_amount)),
+                feeAsset = GetTokenByHash(o.fills.Select(f => f.fee_asset_id).FirstOrDefault()),
+                filledQuanity = o.fills.Sum(f => decimal.Parse(f.filled_amount)),
+                offerAsset = GetTokenByHash(o.offer_asset_id),
+                orderStatus = o.order_status,
+                originalQuantity = decimal.Parse(o.offer_amount),
+                offerAmount = _helper.DeCalculateAmount(decimal.Parse(o.offer_amount)),
+                remainingQuantity = o.makes.Sum(m => decimal.Parse(m.offer_amount)),
+                side = o.side,
+                status = o.status,
+                useSWTH = o.use_native_token,
+                wantAmount = _helper.DeCalculateAmount(decimal.Parse(o.want_amount)),
+                wantAsset = GetTokenByHash(o.want_asset_id),
+                id = o.id,
+            }).ToList();
+
+            return switcheoOrderList.ToArray();
+        }
+
         /// <summary>
         /// Get orders
         /// </summary>
@@ -814,7 +931,7 @@ namespace SwitcheoApi.NetCore.Data
         {
             var endpoint = "/v2/orders";
 
-            var queryString = $"?address={address}";
+            var queryString = $"?address={address}&contract_hash={_contract_hash}";
             if (pair != "")
             {
                 queryString += $"&pair={pair}";
@@ -931,7 +1048,7 @@ namespace SwitcheoApi.NetCore.Data
             var timestamp = GetTimestamp();
             
             var request = new Dictionary<string, object>();
-            request.Add("blockchain", "neo");
+            request.Add("blockchain", _blockchain.ToString());
             request.Add("contract_hash", _contract_hash.ToLower());
             request.Add("order_type", "limit");
             request.Add("pair", pair.ToUpper());
@@ -943,7 +1060,7 @@ namespace SwitcheoApi.NetCore.Data
 
             var signature = SignMessage(request);
 
-            request.Add("address", _neoWallet.scriptHash.Substring(2));
+            request.Add("address", _neoWallet.exchangeAddress);
             request.Add("signature", signature);
 
             try
@@ -1066,7 +1183,7 @@ namespace SwitcheoApi.NetCore.Data
             var signature = SignMessage(sigDic);
 
             sigDic.Add("signature", signature);
-            sigDic.Add("address", _neoWallet.scriptHash);
+            sigDic.Add("address", _neoWallet.exchangeAddress);
 
             try
             {
@@ -1210,17 +1327,6 @@ namespace SwitcheoApi.NetCore.Data
         }
 
         /// <summary>
-        /// Get all tokens supported by the exchange
-        /// </summary>
-        /// <returns>Dictionary of tokens</returns>
-        private Dictionary<string, Token> GetTokenList()
-        {
-            var tokens = GetTokens().Result;
-
-            return tokens;
-        }
-
-        /// <summary>
         /// Gets latest or specified contract hash
         /// </summary>
         /// <returns>String of hash</returns>
@@ -1228,7 +1334,7 @@ namespace SwitcheoApi.NetCore.Data
         {
             var contracts = GetContracts().Result;
 
-            var versions = contracts["NEO"];
+            var versions = contracts[_blockchain.ToString().ToUpper()];
 
             var hash = string.Empty;
 
