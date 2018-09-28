@@ -3,7 +3,7 @@
 
 This library is available on NuGet for download: https://www.nuget.org/packages/SwitcheoApi.NetCore
 ```
-PM> Install-Package SwitcheoApi.NetCore -Version 1.2.0
+PM> Install-Package SwitcheoApi.NetCore
 ```
 
 Switcheo is a Decentralized cryptocurrency exchange (DEX) for trading tokens built on the NEO blockchain (NEP-5)  
