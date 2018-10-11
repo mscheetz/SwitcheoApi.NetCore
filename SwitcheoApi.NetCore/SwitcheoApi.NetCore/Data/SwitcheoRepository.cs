@@ -167,7 +167,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -201,7 +201,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -255,7 +255,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
 
         }
@@ -316,7 +316,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -337,7 +337,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -384,7 +384,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -459,7 +459,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -566,7 +566,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -630,7 +630,7 @@ namespace SwitcheoApi.NetCore.Data
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
