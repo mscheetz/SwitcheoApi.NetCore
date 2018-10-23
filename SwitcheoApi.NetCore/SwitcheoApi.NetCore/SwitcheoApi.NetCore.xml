@@ -1,0 +1,1834 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SwitcheoApi.NetCore</name>
+    </assembly>
+    <members>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.DecimalToString(System.Decimal,System.Int32)">
+            <summary>
+            Convert a decimal to a string with fixed number of decimal places
+            </summary>
+            <param name="val">Decimal value to convert</param>
+            <param name="fixedPlaces">Number of decimal places (default = 8)</param>
+            <returns>Converted string</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.GetSecureString(System.String)">
+            <summary>
+            Convert a string to a SecureString
+            </summary>
+            <param name="stringValue">String value to convert</param>
+            <returns>SecureString from string</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.SecureStringToString(System.Security.SecureString)">
+            <summary>
+            Conver SecureString to string
+            </summary>
+            <param name="secureString">SecureString value</param>
+            <returns>String from SecureString</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.ValueToByteArray(System.String)">
+            <summary>
+            Convert string to byte array
+            from https://github.com/CityOfZion/NeoModules/blob/master/src/NeoModules.Core/UInt160.cs
+            </summary>
+            <param name="value">String to convert</param>
+            <returns>Byte array</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.GetFromUnixTime(System.Int64,SwitcheoApi.NetCore.Entities.Interval,System.Int32)">
+            <summary>
+            Get off-set timestamp
+            </summary>
+            <param name="timestamp">Base timestamp</param>
+            <param name="interval">Time interval</param>
+            <param name="sticks">Number of sticks</param>
+            <returns>Calculated timestamp</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.ListToQueryString(System.Collections.Generic.List{System.String})">
+            <summary>
+            Convert a list of strings to a query string
+            </summary>
+            <param name="list">List of strings to convert</param>
+            <returns>Query string from list</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.IntervalToSeconds(SwitcheoApi.NetCore.Entities.Interval)">
+            <summary>
+            Convert interval to total seconds
+            </summary>
+            <param name="interval">Interval value</param>
+            <returns>Long of seconds</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.SupportedAssets">
+            <summary>
+            Get supported assets with ids
+            </summary>
+            <returns>Dictionary of assets and ids</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.CalculateAmount(System.String,System.Decimal,System.Collections.Generic.Dictionary{System.String,SwitcheoApi.NetCore.Entities.Token})">
+            <summary>
+            Calculate transaction amount to post
+            </summary>
+            <param name="pair">Trading pair</param>
+            <param name="amount">Amount to convert</param>
+            <param name="tokens">Tokens and precision</param>
+            <returns>String of converted amount</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.DeCalculateAmount(System.String,System.Decimal,System.Collections.Generic.Dictionary{System.String,SwitcheoApi.NetCore.Entities.Token})">
+            <summary>
+            DeCalculate transaction amount to post
+            </summary>
+            <param name="pair">Trading pair</param>
+            <param name="amount">Amount to convert</param>
+            <param name="tokens">Tokens and precision</param>
+            <returns>Decimal of converted amount</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.DeCalculateAmount(System.Decimal,SwitcheoApi.NetCore.Entities.Token)">
+            <summary>
+            DeCalculate transaction amount to post
+            </summary>
+            <param name="amount">Amount to convert</param>
+            <param name="tokens">Token to calculate</param>
+            <returns>Decimal of converted amount</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Helper.DeCalculateAmount(System.Decimal,System.Double)">
+            <summary>
+            DeCalculate transaction amount to post
+            </summary>
+            <param name="amount">Amount to convert</param>
+            <param name="pow">Decimal precision</param>
+            <returns>Decimal of converted amount</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Security.SignMessage(System.String,SwitcheoApi.NetCore.Entities.NeoWallet)">
+            <summary>
+            Sign a message
+            </summary>
+            <param name="message">Message to sign</param>
+            <param name="wallet">Wallet for signature</param>
+            <returns>String of signature</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Security.SignTransaction(System.Byte[],SwitcheoApi.NetCore.Entities.NeoWallet)">
+            <summary>
+            Sign a message
+            </summary>
+            <param name="toSign">Message to sign</param>
+            <param name="wallet">Wallet for signature</param>
+            <returns>String of signature</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Security.PrepMessage(System.String)">
+            <summary>
+            Prepare a message to sign
+            </summary>
+            <param name="message">Message to sign</param>
+            <returns>String of prepared message</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Security.PrepAndSerializeMessage(System.String)">
+            <summary>
+            Prepare and serialze a message
+            </summary>
+            <param name="message">Mesage to prep</param>
+            <returns>Byte array of message</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Security.GenerateSignature(System.Byte[],SwitcheoApi.NetCore.Entities.NeoWallet)">
+            <summary>
+            Generate a signature
+            Using https://github.com/Zaliro/Switcheo.Net/blob/master/Switcheo.Net/SwitcheoAuthenticationProvider.cs
+            </summary>
+            <param name="message">Message to sign</param>
+            <param name="wallet">Wallet for signature</param>
+            <returns>Message signature</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.Security.ProcessSignature(Org.BouncyCastle.Math.BigInteger[])">
+            <summary>
+            Process a signature
+            Using https://github.com/Zaliro/Switcheo.Net/blob/master/Switcheo.Net/SwitcheoAuthenticationProvider.cs
+            </summary>
+            <param name="signedMessage">Fully signed message</param>
+            <returns>Message signature</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.TransactionProcessor.GetSignedTransaction(SwitcheoApi.NetCore.Entities.Transaction)">
+            <summary>
+            Get a SignedTransaction from a Transaction
+            </summary>
+            <param name="txn">Transaction to serialize</param>
+            <returns>SignedTransaction object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.TransactionProcessor.GetTransactionAttributes(SwitcheoApi.NetCore.Entities.TransactionAttributes[])">
+            <summary>
+            Get TransactionAttribute array from TransactionAttributes array
+            </summary>
+            <param name="attrs">TransactionAttributes to convert</param>
+            <returns>TransactionAttribute array</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.TransactionProcessor.GetTransactionInputs(SwitcheoApi.NetCore.Entities.TransactionInput[])">
+            <summary>
+            Get Input array from TransactionInput array
+            </summary>
+            <param name="inputs">TransactionInput to convert</param>
+            <returns>Input array</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.TransactionProcessor.GetTransactionOutputs(SwitcheoApi.NetCore.Entities.TransactionOutput[])">
+            <summary>
+            Get Output array from TransactionOutput array
+            </summary>
+            <param name="outputs">TransactionOutput to convert</param>
+            <returns>Output array</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Core.TransactionProcessor.GetTransactionWitnesses(System.String[])">
+            <summary>
+            Get Witness array from string array
+            </summary>
+            <param name="scripts">scripts to convert</param>
+            <returns>Witness array</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetTokens">
+            <summary>
+            Retrieve a list of supported tokens on Switcheo.
+            </summary>
+            <returns>Tokens dictionary</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetTokenBySymbol(System.String)">
+            <summary>
+            Get a Token by symbol
+            </summary>
+            <param name="symbol">Symbol of token</param>
+            <returns>Token object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetTokenByHash(System.String)">
+            <summary>
+            Get a token by hash
+            </summary>
+            <param name="hash">Hash of token</param>
+            <returns>Token symbol value</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetPairs(System.String[])">
+            <summary>
+            Get available currency pairs on Switcheo Exchange 
+            </summary>
+            <param name="bases">Base pairs to filter on (default all pairs)</param>
+            <returns>Array of trading pairs</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetContracts">
+            <summary>
+            Get hashes of contracts deployed by Switcheo
+            </summary>
+            <returns>Contracts dictionary</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetCandlesticks(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int32)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">End time of last candlestick (defaults to current UTC time)</param>
+            <param name="stickCount">Number of candlesticks to return (defaults to 10)</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetCandleSticks(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int64)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">Unix time of last candlestick</param>
+            <param name="startTime">Unix time of 1st candlestick</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetLast24Hours">
+            <summary>
+            Get 24-hour data for all pairs and markets
+            </summary>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetLastPrice(System.String[],System.String[])">
+            <summary>
+            Get last price of given symbol
+            </summary>
+            <param name="symbols">String array of currency symbols (default null)</param>
+            <param name="bases">String array of base pairs (default null)</param>
+            <returns>LastPrices dictionary</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetLastPrice(System.String)">
+            <summary>
+            Get last price for a trading pair
+            </summary>
+            <param name="pair">String of trading pair</param>
+            <returns>Decimal of last price</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOrderBook(System.String)">
+            <summary>
+            Get best 70 offers on the offer book with converted values
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>OrderBook object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOffers(System.String)">
+            <summary>
+            Get best 70 offers on the offer book
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of Offers</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetTrades(System.String)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetTrades(System.String,System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="tradeCount">Number of trades to return</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetTrades(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetTrades(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <param name="tradeCount">Number of trades to return (default = 10)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetWallet">
+            <summary>
+            Get loaded wallet
+            </summary>
+            <returns>NeoWallet if loaded</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetBalances">
+            <summary>
+            Get contract balance for signed in user
+            </summary>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetBalances(System.String)">
+            <summary>
+            Get contract balance of a given address
+            </summary>
+            <param name="address">String of addresses</param>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.Deposit(System.String,System.Decimal)">
+            <summary>
+            Create and execute a deposit to the exchange
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CreateDeposit(System.String,System.Decimal)">
+            <summary>
+            Post a deposit
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.ExecuteDeposit(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            Execute a deposit
+            </summary>
+            <param name="deposit">Deposit detail from creation</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.Withdrawal(System.String,System.Decimal)">
+            <summary>
+            Create and execute a withdrawal from the exchange
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CreateWithdrawal(System.String,System.Decimal)">
+            <summary>
+            Create a withdrawal
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Withdrawal id</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.ExecuteWithdrawal(System.String)">
+            <summary>
+            Execute a withdrawal
+            </summary>
+            <param name="withdrawalId">Guid of withdrawal request</param>
+            <returns>Withdrawal response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetSwitcheoOrder(System.String)">
+            <summary>
+            Get an Order by Id in human readable format
+            </summary>
+            <param name="id">Order Id</param>
+            <returns>SwitcheoOrder object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetSwitcheoOrders">
+            <summary>
+            Get orders for current address in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetSwitcheoOrders(System.String)">
+            <summary>
+            Get orders for current address for a given trading pair in human readable format
+            </summary>
+            <param name="pair">Trading pair</param>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOpenSwitcheoOrders">
+            <summary>
+            Get all open Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetCompletedSwitcheoOrders">
+            <summary>
+            Get all completed Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOrder(System.String)">
+            <summary>
+            Get an Order by Id
+            </summary>
+            <param name="id">Order Id</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOpenOrders">
+            <summary>
+            Get all open Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetCompletedOrders">
+            <summary>
+            Get all completed Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOrders">
+            <summary>
+            Get orders for current address
+            </summary>
+            <param name="address">Address with orders</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOrders(System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetOrders(System.String,System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <param name="pair">String of pair to match</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CreateNeoOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates an order which can be executed through BroadcastOrder.
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CreateTokenOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates an order which can be executed through BroadcastOrder.
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="tokenAmount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.PlaceNeoOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using Neo amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.PlaceOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using token amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="amount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.BroadcastOrder(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the second endpoint required to execute an order. 
+            After using the CreateOrder endpoint, 
+            you will receive a response which needs to be signed.
+            </summary>
+            <param name="order">Order created</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CancelOrder(System.String)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="orderId">Id of order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CancelOrder(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="order">Order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CreateCancellation(System.String)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            </summary>
+            <param name="orderId">Order Id to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.CreateCancellation(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            </summary>
+            <param name="order">Order to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.ExecuteCancellation(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            This is the second endpoint that must be called to cancel an order. 
+            After calling the CreateCancellation endpoint, 
+            you will receive a transaction in the response which must be signed.
+            </summary>
+            <param name="cancellation">Cancellation object</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.Interface.ISwitcheoRepository.GetServerTime">
+            <summary>
+            Get server timestamp
+            </summary>
+            <returns>Long of timestamp</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.#ctor">
+            <summary>
+            Constructor for non-auth apis
+            </summary>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.#ctor(SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor for non-auth apis
+            </summary>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.#ctor(System.String,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor for non-auth apis
+            </summary>
+            <param name="version">Contract version (default = "")</param>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.#ctor(System.String,System.String,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor for all apis
+            </summary>
+            <param name="loginValue">Neo public address or private key</param>
+            <param name="version">Contract version (default = "")</param>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.#ctor(System.Boolean,System.String,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor for non-auth apis
+            </summary>
+            <param name="testRegion">Use test region (default = false)</param>
+            <param name="version">Contract version (default = "")</param>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.#ctor(System.String,System.Boolean,System.String,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor for all apis
+            </summary>
+            <param name="loginValue">Neo public address or private key</param>
+            <param name="testRegion">Use test region (default = false)</param>
+            <param name="version">Contract version (default = "")</param>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.TimestampCompare">
+            <summary>
+            Compare exchange and system unix timestamps
+            </summary>
+            <returns>True if difference less than 1000 MS, otherwise false</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetServerTime">
+            <summary>
+            Get server timestamp
+            </summary>
+            <returns>Long of timestamp</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetContracts">
+            <summary>
+            Get hashes of contracts deployed by Switcheo
+            </summary>
+            <returns>Contracts dictionary</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTokens">
+            <summary>
+            Retrieve a list of supported tokens on Switcheo.
+            </summary>
+            <returns>Tokens dictionary</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnGetTokens">
+            <summary>
+            Retrieve a list of supported tokens on Switcheo.
+            </summary>
+            <returns>Tokens dictionary</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTokenBySymbol(System.String)">
+            <summary>
+            Get a Token by symbol
+            </summary>
+            <param name="symbol">Symbol of token</param>
+            <returns>Token object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTokenByHash(System.String)">
+            <summary>
+            Get a token by hash
+            </summary>
+            <param name="hash">Hash of token</param>
+            <returns>Token symbol value</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetPairs(System.String[])">
+            <summary>
+            Get available currency pairs on Switcheo Exchange 
+            </summary>
+            <param name="bases">Base pairs to filter on (default all pairs)</param>
+            <returns>Array of trading pairs</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetCandlesticks(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int32)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">End time of last candlestick (defaults to current UTC time)</param>
+            <param name="stickCount">Number of candlesticks to return (defaults to 10)</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetCandleSticks(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int64)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">Unix time of last candlestick</param>
+            <param name="startTime">Unix time of 1st candlestick</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetLast24Hours">
+            <summary>
+            Get 24-hour data for all pairs and markets
+            </summary>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetLastPrice(System.String[],System.String[])">
+            <summary>
+            Get last price of given symbol
+            </summary>
+            <param name="symbols">String array of currency symbols (default null)</param>
+            <param name="bases">String array of base pairs (default null)</param>
+            <returns>LastPrices dictionary</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetLastPrice(System.String)">
+            <summary>
+            Get last price for a trading pair
+            </summary>
+            <param name="pair">String of trading pair</param>
+            <returns>Decimal of last price</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOrderBook(System.String)">
+            <summary>
+            Get best 70 offers on the offer book with converted values
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>OrderBook object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOffers(System.String)">
+            <summary>
+            Get best 70 offers on the offer book
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of Offers</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTrades(System.String)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTrades(System.String,System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="tradeCount">Number of trades to return</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTrades(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTrades(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <param name="tradeCount">Number of trades to return</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnGetTrades(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <param name="tradeCount">Number of trades to return (default = 5000)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetWallet">
+            <summary>
+            Get loaded wallet
+            </summary>
+            <returns>NeoWallet if loaded</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetBalances">
+            <summary>
+            Get contract balance for signed in user
+            </summary>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetBalances(System.String)">
+            <summary>
+            Get contract balance of a given address
+            </summary>
+            <param name="scriptHash">String of script hash (address)</param>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnGetBalances(System.String)">
+            <summary>
+            Get contract balance of a given address
+            </summary>
+            <param name="address">String of addresses</param>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.Deposit(System.String,System.Decimal)">
+            <summary>
+            Create and execute a deposit to the exchange
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CreateDeposit(System.String,System.Decimal)">
+            <summary>
+            Create a deposit
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.ExecuteDeposit(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            Execute a deposit
+            </summary>
+            <param name="deposit">Deposit detail from creation</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.Withdrawal(System.String,System.Decimal)">
+            <summary>
+            Create and execute a withdrawal from the exchange
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CreateWithdrawal(System.String,System.Decimal)">
+            <summary>
+            Create a withdrawal
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Withdrawal id</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.ExecuteWithdrawal(System.String)">
+            <summary>
+            Execute a withdrawal
+            </summary>
+            <param name="withdrawalId">Guid of withdrawal request</param>
+            <returns>Withdrawal response</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetSwitcheoOrder(System.String)">
+            <summary>
+            Get an Order by Id in human readable format
+            </summary>
+            <param name="id">Order Id</param>
+            <returns>SwitcheoOrder object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetSwitcheoOrders">
+            <summary>
+            Get orders for current address in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetSwitcheoOrders(System.String)">
+            <summary>
+            Get orders for current address for a given trading pair in human readable format
+            </summary>
+            <param name="pair">Trading pair</param>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOpenSwitcheoOrders">
+            <summary>
+            Get all open Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetCompletedSwitcheoOrders">
+            <summary>
+            Get all completed Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOrder(System.String)">
+            <summary>
+            Get an order by order id
+            </summary>
+            <param name="id">Order id</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOpenOrders">
+            <summary>
+            Get all open Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetCompletedOrders">
+            <summary>
+            Get all completed Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOrders">
+            <summary>
+            Get orders for current address
+            </summary>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOrders(System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetOrders(System.String,System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <param name="pair">String of pair to match</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnGetSwitcheoOrders(System.String,System.String)">
+            <summary>
+            Get Orders in human readable format
+            </summary>
+            <param name="address">Address with orders</param>
+            <param name="pair">String of pair to match</param>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnGetOrders(System.String,System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <param name="pair">String of pair to match</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CreateNeoOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates an order which can be executed through BroadcastOrder.
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CreateTokenOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates an order which can be executed through BroadcastOrder.
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="tokenAmount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.PlaceNeoOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using Neo amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.PlaceOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using token amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="amount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnCreateAndExecuteOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates and broadcasts an order.
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="amount">Decimal of order amount</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnCreateOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates an order which can be executed through BroadcastOrder.
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="amount">Decimal of order amount</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.BroadcastOrder(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the second endpoint required to execute an order. 
+            After using the CreateOrder endpoint, 
+            you will receive a response which needs to be signed.
+            </summary>
+            <param name="order">Order created</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CancelOrder(System.String)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="orderId">Id of order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CancelOrder(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="order">Order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CreateCancellation(System.String)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            </summary>
+            <param name="orderId">Order Id to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.CreateCancellation(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            </summary>
+            <param name="order">Order to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.OnCreateCancellation(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            </summary>
+            <param name="order">Order to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.ExecuteCancellation(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            This is the second endpoint that must be called to cancel an order. 
+            After calling the CreateCancellation endpoint, 
+            you will receive a transaction in the response which must be signed.
+            </summary>
+            <param name="cancellation">Cancellation object</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.SignMessage``1(``0)">
+            <summary>
+            Sign a message
+            </summary>
+            <typeparam name="T">Type of object</typeparam>
+            <param name="toSign">Message to sign</param>
+            <returns>String of signature</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.SignMessage(System.String)">
+            <summary>
+            Sign a message
+            </summary>
+            <param name="message">Message to sign</param>
+            <returns>String of signature</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetAmount(System.String,System.Decimal)">
+            <summary>
+            Get converted exchange amount
+            </summary>
+            <param name="asset">Asset to calculate</param>
+            <param name="amount">Amount of token to convert</param>
+            <returns>String of exchange amount</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetTimestamp">
+            <summary>
+            Get unix timestamp
+            </summary>
+            <returns>Long of timestamp</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.SignFills(SwitcheoApi.NetCore.Entities.Fill[])">
+            <summary>
+            Sign fills in an order
+            </summary>
+            <param name="fills">Array of fills to sign</param>
+            <returns>String array of signatures</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.SignMakes(SwitcheoApi.NetCore.Entities.Make[])">
+            <summary>
+            Sign makes in an order
+            </summary>
+            <param name="makes">Array of makes to sign</param>
+            <returns>String array of signatures</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.SignTransaction(SwitcheoApi.NetCore.Entities.Transaction)">
+            <summary>
+            Sign a Transaction object
+            </summary>
+            <param name="txn">Transaction to sign</param>
+            <returns>String of signature</returns>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Data.SwitcheoRepository.GetContractHash">
+            <summary>
+            Gets latest or specified contract hash
+            </summary>
+            <returns>String of hash</returns>
+        </member>
+        <member name="T:SwitcheoApi.NetCore.Entities.NeoWallet">
+            <summary>
+            Represents a NEO Wallet
+            </summary>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Entities.NeoWallet.#ctor(System.String)">
+            <summary>
+            Constructor to set address
+            </summary>
+            <param name="address">String of public address or script hash</param>
+        </member>
+        <member name="M:SwitcheoApi.NetCore.Entities.NeoWallet.#ctor(System.Security.SecureString)">
+            <summary>
+            Constructor to get address and script hash
+            </summary>
+            <param name="wif">SecureString of WIF</param>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.#ctor">
+            <summary>
+            Constructor, no authorization
+            </summary>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.#ctor(System.String)">
+            <summary>
+            Constructor, with authorization
+            </summary>
+            <param name="loginValue">Neo public address or private key</param>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.#ctor(System.String,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor, with authorization
+            </summary>
+            <param name="loginValue">Neo public address or private key</param>
+            <param name="blockchain">Blockchain (neo, eth, qtum)</param>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.#ctor(System.Boolean,System.String,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor, no authorization
+            </summary>
+            <param name="testRegion">Boolean to use test region (default = false)</param>
+            <param name="version">Contract version (default latest)</param>
+            <param name="blockchain">Blockchain (default = neo)</param>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.#ctor(System.String,System.Boolean,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor, with authorization
+            </summary>
+            <param name="loginValue">Neo public address or private key</param>
+            <param name="testRegion">Boolean to use test region (default = false)</param>
+            <param name="version">Contract version (default latest)</param>
+            <param name="blockchain">Blockchain (default = neo)</param>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.#ctor(System.String,System.Boolean,System.String,SwitcheoApi.NetCore.Entities.Blockchain)">
+            <summary>
+            Constructor, with authorization
+            </summary>
+            <param name="loginValue">Neo public address or private key</param>
+            <param name="testRegion">Boolean to use test region (default = false)</param>
+            <param name="version">Contract version (default latest)</param>
+            <param name="blockchain">Blockchain (default = neo)</param>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetWallet">
+            <summary>
+            Get a wallet, if loaded
+            </summary>
+            <returns>NeoWallet object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTokens">
+            <summary>
+            Retrieve a list of supported tokens on Switcheo.
+            </summary>
+            <returns>Tokens dictionary</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetPairs(System.String[])">
+            <summary>
+            Get available currency pairs on Switcheo Exchange 
+            </summary>
+            <param name="bases">Base pairs to filter on (default all pairs)</param>
+            <returns>Array of trading pairs</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetContracts">
+            <summary>
+            Get hashes of contracts deployed by Switcheo
+            </summary>
+            <returns>Contracts dictionary</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCandlesticks(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int32)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">End time of last candlestick (defaults to current UTC time)</param>
+            <param name="stickCount">Number of candlesticks to return (defaults to 10)</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCandleSticks(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int64)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">Unix time of last candlestick</param>
+            <param name="startTime">Unix time of 1st candlestick</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetLast24Hours">
+            <summary>
+            Get 24-hour data for all pairs and markets
+            </summary>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetLastPrice(System.String[],System.String[])">
+            <summary>
+            Get last price of given symbol
+            </summary>
+            <param name="symbols">String array of currency symbols (default null)</param>
+            <param name="bases">String array of base pairs (default null)</param>
+            <returns>LastPrices dictionary</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetLastPrice(System.String)">
+            <summary>
+            Get last price for a trading pair
+            </summary>
+            <param name="pair">String of trading pair</param>
+            <returns>Decimal of last price</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrderBook(System.String)">
+            <summary>
+            Get best 70 offers on the offer book with converted values
+            Currently only returning asks
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>OrderBook object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOffers(System.String)">
+            <summary>
+            Get best 70 offers on the offer book
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of Offers</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTrades(System.String)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTrades(System.String,System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="tradeCount">Number of trades to return</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTrades(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTrades(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <param name="tradeCount">Number of trades to return (default = 10)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetBalances">
+            <summary>
+            Get contract balance for signed in user
+            </summary>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetBalances(System.String)">
+            <summary>
+            Get contract balance of a given script hash (address)
+            </summary>
+            <param name="scriptHash">String of script hash</param>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.Deposit(System.String,System.Decimal)">
+            <summary>
+            Create and execute a deposit to the exchange
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateDeposit(System.String,System.Decimal)">
+            <summary>
+            Create a deposit
+            It can be executed through ExecuteDeposit.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.ExecuteDeposit(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            Execute a deposit
+            </summary>
+            <param name="deposit">Deposit detail from creation</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.Withdrawal(System.String,System.Decimal)">
+            <summary>
+            Create and execute a withdrawal from the exchange
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateWithdrawal(System.String,System.Decimal)">
+            <summary>
+            Create a withdrawal
+            It can be executed through ExecuteWithdrawal.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Withdrawal id</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.ExecuteWithdrawal(System.String)">
+            <summary>
+            Execute a withdrawal
+            </summary>
+            <param name="withdrawalId">Guid of withdrawal request</param>
+            <returns>Withdrawal response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetSwitcheoOrder(System.String)">
+            <summary>
+            Get an Order by Id in human readable format
+            </summary>
+            <param name="id">Order Id</param>
+            <returns>SwitcheoOrder object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetSwitcheoOrders">
+            <summary>
+            Get orders for current address in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetSwitcheoOrders(System.String)">
+            <summary>
+            Get orders for current address for a given trading pair in human readable format
+            </summary>
+            <param name="pair">Trading pair</param>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOpenSwitcheoOrders">
+            <summary>
+            Get all open Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCompletedSwitcheoOrders">
+            <summary>
+            Get all completed Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrder(System.String)">
+            <summary>
+            Get an Order by Id
+            </summary>
+            <param name="id">Order Id</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOpenOrders">
+            <summary>
+            Get all open Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCompletedOrders">
+            <summary>
+            Get all completed Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrders">
+            <summary>
+            Get orders for current address
+            </summary>
+            <param name="address">Address with orders</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrders(System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrders(System.String,System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <param name="pair">String of pair to match</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.PlaceNeoOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using Neo amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.PlaceOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using token amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="amount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateNeoOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates a Neo order which can be executed through BroadcastOrder.
+            BROADCAST REQUIRED
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateTokenOrder(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates a Token order which can be executed through BroadcastOrder.
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="tokenAmount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.BroadcastOrder(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the second endpoint required to execute an order. 
+            After using the CreateOrder endpoint, 
+            you will receive a response which needs to be signed.
+            </summary>
+            <param name="order">Order created</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CancelOrder(System.String)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="orderId">Id of order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CancelOrder(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="order">Order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateCancellation(System.String)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            It can be executed through ExecuteCancellation.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="orderId">Order Id to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateCancellation(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled. 
+            It can be executed through ExecuteCancellation.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="order">Order to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.ExecuteCancellation(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            This is the second endpoint that must be called to cancel an order. 
+            After calling the CreateCancellation endpoint, 
+            you will receive a transaction in the response which must be signed.
+            </summary>
+            <param name="cancellation">Cancellation object</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetServerTime">
+            <summary>
+            Get server timestamp
+            </summary>
+            <returns>Long of timestamp</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetPairsAsync(System.String[])">
+            <summary>
+            Get available currency pairs on Switcheo Exchange 
+            </summary>
+            <param name="bases">Base pairs to filter on (default all pairs)</param>
+            <returns>Array of trading pairs</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetContractsAsync">
+            <summary>
+            Get hashes of contracts deployed by Switcheo
+            </summary>
+            <returns>Contracts dictionary</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCandlesticksAsync(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int32)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">End time of last candlestick (defaults to current UTC time)</param>
+            <param name="stickCount">Number of candlesticks to return (defaults to 10)</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCandleSticksAsync(System.String,SwitcheoApi.NetCore.Entities.Interval,System.Int64,System.Int64)">
+            <summary>
+            Get candlestick chart data
+            </summary>
+            <param name="pair">Pair to filter</param>
+            <param name="interval">Time interval of candlestick</param>
+            <param name="endTime">Unix time of last candlestick</param>
+            <param name="startTime">Unix time of 1st candlestick</param>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetLast24HoursAsync">
+            <summary>
+            Get 24-hour data for all pairs and markets
+            </summary>
+            <returns>Array of Candlesticks</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetLastPriceAsync(System.String[],System.String[])">
+            <summary>
+            Get last price of given symbol
+            </summary>
+            <param name="symbols">String array of currency symbols (default null)</param>
+            <param name="bases">String array of base pairs (default null)</param>
+            <returns>LastPrices dictionary</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetLastPriceAsync(System.String)">
+            <summary>
+            Get last price for a trading pair
+            </summary>
+            <param name="pair">String of trading pair</param>
+            <returns>Decimal of last price</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrderBookAsync(System.String)">
+            <summary>
+            Get best 70 offers on the offer book with converted values
+            Currently only returning asks
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>OrderBook object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOffersAsync(System.String)">
+            <summary>
+            Get best 70 offers on the offer book
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of Offers</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTradesAsync(System.String)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTradesAsync(System.String,System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="tradeCount">Number of trades to return</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTradesAsync(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetTradesAsync(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.Int32)">
+            <summary>
+            Get executed trades for a given pair
+            </summary>
+            <param name="pair">String of pair</param>
+            <param name="fromDate">Only return trades after this date (default = null)</param>
+            <param name="toDate">Only return trades before this date (default = null)</param>
+            <param name="tradeCount">Number of trades to return (default = 10)</param>
+            <returns>Array of TradeDetail</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetBalancesAsync">
+            <summary>
+            Get contract balance for signed in user
+            </summary>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetBalancesAsync(System.String)">
+            <summary>
+            Get contract balance of a given script hash
+            </summary>
+            <param name="scriptHash">String of script hash</param>
+            <returns>Balance response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.DepositAsync(System.String,System.Decimal)">
+            <summary>
+            Create and execute a deposit to the exchange
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateDepositAsync(System.String,System.Decimal)">
+            <summary>
+            Create a deposit
+            It can be executed through ExecuteDeposit.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="asset">Asset to deposit</param>
+            <param name="amount">Amount to deposit</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.ExecuteDepositAsync(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            Execute a deposit
+            </summary>
+            <param name="deposit">Deposit detail from creation</param>
+            <returns>Deposit response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.WithdrawalAsync(System.String,System.Decimal)">
+            <summary>
+            Create and execute a withdrawal from the exchange
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateWithdrawalAsync(System.String,System.Decimal)">
+            <summary>
+            Create a withdrawal
+            It can be executed through ExecuteWithdrawal.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="asset">Asset to withdrawal</param>
+            <param name="amount">Amount to withdrawal</param>
+            <returns>Withdrawal id</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.ExecuteWithdrawalAsync(System.String)">
+            <summary>
+            Execute a withdrawal
+            </summary>
+            <param name="withdrawalId">Guid of withdrawal request</param>
+            <returns>Withdrawal response</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetSwitcheoOrderAsync(System.String)">
+            <summary>
+            Get an Order by Id in human readable format
+            </summary>
+            <param name="id">Order Id</param>
+            <returns>SwitcheoOrder object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetSwitcheoOrdersAsync">
+            <summary>
+            Get orders for current address in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetSwitcheoOrdersAsync(System.String)">
+            <summary>
+            Get orders for current address for a given trading pair in human readable format
+            </summary>
+            <param name="pair">Trading pair</param>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOpenSwitcheoOrdersAsync">
+            <summary>
+            Get all open Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCompletedSwitcheoOrdersAsync">
+            <summary>
+            Get all completed Orders in human readable format
+            </summary>
+            <returns>Array of SwitcheoOrder objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrderAsync(System.String)">
+            <summary>
+            Get an Order by Id
+            </summary>
+            <param name="id">Order Id</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOpenOrdersAsync">
+            <summary>
+            Get all open Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetCompletedOrdersAsync">
+            <summary>
+            Get all completed Orders
+            </summary>
+            <returns>Array of Order objects</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrdersAsync">
+            <summary>
+            Get orders for current address
+            </summary>
+            <param name="address">Address with orders</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrdersAsync(System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetOrdersAsync(System.String,System.String)">
+            <summary>
+            Get orders
+            </summary>
+            <param name="address">Address with orders</param>
+            <param name="pair">String of pair to match</param>
+            <returns>Array of orders</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.PlaceNeoOrderAsync(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using Neo amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.PlaceOrderAsync(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint places an order using token amount
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="amount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateNeoOrderAsync(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates a Neo order which can be executed through BroadcastOrder.
+            BROADCAST REQUIRED
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="neoAmount">Decimal amount of NEO to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateTokenOrderAsync(System.String,SwitcheoApi.NetCore.Entities.Side,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>
+            This endpoint creates a Token order which can be executed through BroadcastOrder.
+            BROADCAST REQUIRED
+            </summary>
+            <param name="pair">String of pair to match</param>
+            <param name="side">Buy or Sell</param>
+            <param name="price">Decimal of order price</param>
+            <param name="tokenAmount">Decimal amount of tokens to buy/sell</param>
+            <param name="useSWTH">Boolean to use SWTH for fees</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.BroadcastOrderAsync(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the second endpoint required to execute an order. 
+            After using the CreateOrder endpoint, 
+            you will receive a response which needs to be signed.
+            </summary>
+            <param name="order">Order created</param>
+            <returns>Boolean when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CancelOrderAsync(System.String)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="orderId">Id of order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CancelOrderAsync(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            Cancel an order
+            </summary>
+            <param name="order">Order to cancel</param>
+            <returns>Cancelled Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateCancellationAsync(System.String)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            It can be executed through ExecuteCancellation.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="orderId">Order Id to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.CreateCancellationAsync(SwitcheoApi.NetCore.Entities.Order)">
+            <summary>
+            This is the first API call required to cancel an order. 
+            Only orders with makes and with 
+            an available_amount of more than 0 can be cancelled.
+            It can be executed through ExecuteCancellation.
+            EXECUTE REQUIRED
+            </summary>
+            <param name="order">Order to be cancelled</param>
+            <returns>TransactionResponse when complete</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.ExecuteCancellationAsync(SwitcheoApi.NetCore.Entities.TransactionResponse)">
+            <summary>
+            This is the second endpoint that must be called to cancel an order. 
+            After calling the CreateCancellation endpoint, 
+            you will receive a transaction in the response which must be signed.
+            </summary>
+            <param name="cancellation">Cancellation object</param>
+            <returns>Order object</returns>
+        </member>
+        <member name="M:Switcheo.NetCore.SwitcheoApiClient.GetServerTimeAsync">
+            <summary>
+            Get server timestamp
+            </summary>
+            <returns>Long of timestamp</returns>
+        </member>
+    </members>
+</doc>

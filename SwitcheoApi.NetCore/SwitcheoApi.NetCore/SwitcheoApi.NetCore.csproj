@@ -8,11 +8,16 @@
     <PackageTags>switcheo exchange cryptocurrency neo blockchain dot net standard</PackageTags>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.0</Version>
-    <PackageReleaseNotes>Updates to support .Net Standard</PackageReleaseNotes>
+    <Version>1.3.1</Version>
+    <PackageReleaseNotes>Include comments for nuget package</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/mscheetz/SwitcheoApi.NetCore</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/mscheetz/SwitcheoApi.NetCore/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>2018 Matt Scheetz</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\Source\Git\SwitcheoApi.NetCore\SwitcheoApi.NetCore\SwitcheoApi.NetCore\SwitcheoApi.NetCore.xml</DocumentationFile>
+    <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
